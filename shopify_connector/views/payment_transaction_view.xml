@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Payment Transaction List View -->
+    <record id="view_shopify_payment_transaction_list" model="ir.ui.view">
+        <field name="name">shopify.payment.transaction.list</field>
+        <field name="model">shopify.payment.transaction</field>
+        <field name="arch" type="xml">
+            <list string="Payment Transactions" decoration-success="status=='paid'" decoration-info="status=='authorized'" decoration-muted="status=='failed'">
+                <field name="name"/>
+                <field name="transaction_date"/>
+                <field name="partner_id"/>
+                <field name="order_id"/>
+                <field name="amount" widget="monetary"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="payment_method"/>
+                <field name="gateway"/>
+                <field name="kind"/>
+                <field name="status" widget="badge" decoration-success="status=='paid'" decoration-info="status=='authorized'" decoration-danger="status=='failed'"/>
+                <field name="test_transaction" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Payment Transaction Form View -->
+    <record id="view_shopify_payment_transaction_form" model="ir.ui.view">
+        <field name="name">shopify.payment.transaction.form</field>
+        <field name="model">shopify.payment.transaction</field>
+        <field name="arch" type="xml">
+            <form string="Payment Transaction">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="shopify_instance_id"/>
+                            <field name="shopify_transaction_id"/>
+                            <field name="shopify_order_id"/>
+                            <field name="order_id"/>
+                        </group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="amount" widget="monetary"/>
+                            <field name="currency_id"/>
+                            <field name="transaction_date"/>
+                        </group>
+                    </group>
+                    <group string="Payment Details">
+                        <group>
+                            <field name="payment_method"/>
+                            <field name="gateway"/>
+                            <field name="kind"/>
+                        </group>
+                        <group>
+                            <field name="authorization_code"/>
+                            <field name="test_transaction"/>
+                        </group>
+                    </group>
+                    <group string="Receipt" invisible="not receipt">
+                        <field name="receipt" nolabel="1"/>
+                    </group>
+                    <group string="Error" invisible="not error_message">
+                        <field name="error_message" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Payment Transaction Action -->
+    <record id="action_shopify_payment_transaction" model="ir.actions.act_window">
+        <field name="name">Payment Transactions</field>
+        <field name="res_model">shopify.payment.transaction</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No payment transactions found
+            </p>
+            <p>
+                Payment transactions are automatically synced when importing orders from Shopify.
+            </p>
+        </field>
+    </record>
+</odoo>

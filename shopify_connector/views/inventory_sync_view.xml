@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inventory Sync Form View -->
+    <record id="view_shopify_inventory_sync_form" model="ir.ui.view">
+        <field name="name">shopify.inventory.sync.form</field>
+        <field name="model">shopify.inventory.sync</field>
+        <field name="arch" type="xml">
+            <form string="Inventory Sync">
+                <header>
+                    <button name="sync_inventory_to_shopify" type="object" string="Sync to Shopify"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,done"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="shopify_instance_id" readonly="state != 'draft'"/>
+                            <field name="sync_type" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="sync_date" readonly="1"/>
+                            <field name="products_synced" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Errors" invisible="errors == False">
+                        <field name="errors" widget="text" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Inventory Sync List View -->
+    <record id="view_shopify_inventory_sync_list" model="ir.ui.view">
+        <field name="name">shopify.inventory.sync.list</field>
+        <field name="model">shopify.inventory.sync</field>
+        <field name="arch" type="xml">
+            <list string="Inventory Syncs">
+                <field name="name"/>
+                <field name="shopify_instance_id"/>
+                <field name="sync_date"/>
+                <field name="sync_type"/>
+                <field name="products_synced"/>
+                <field name="state" decoration-info="state == 'draft'"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-success="state == 'done'"
+                       decoration-danger="state == 'failed'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Inventory Sync Action -->
+    <record id="action_shopify_inventory_sync" model="ir.actions.act_window">
+        <field name="name">Inventory Sync</field>
+        <field name="res_model">shopify.inventory.sync</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new inventory sync
+            </p>
+            <p>
+                Sync your Odoo inventory quantities to Shopify.
+            </p>
+        </field>
+    </record>
+
+</odoo>

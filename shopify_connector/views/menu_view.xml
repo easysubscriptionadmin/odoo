@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Shopify Menu -->
+    <menuitem id="shopify_menu_root"
+              name="Shopify"
+              sequence="20"
+              web_icon="shopify_connector,static/description/icon.png"/>
+
+    <!-- Sales Menu -->
+    <menuitem id="shopify_sales_menu"
+              name="Sales"
+              parent="shopify_menu_root"
+              sequence="1"/>
+
+    <menuitem id="shopify_quotations_menu"
+              name="Quotations"
+              parent="shopify_sales_menu"
+              action="action_order_quotation_shopify"
+              sequence="1"/>
+
+    <menuitem id="shopify_orders_menu"
+              name="Orders"
+              parent="shopify_sales_menu"
+              action="action_sale_order_shopify"
+              sequence="2"/>
+
+    <menuitem id="shopify_customers_menu"
+              name="Customers"
+              parent="shopify_sales_menu"
+              action="action_shopify_customer"
+              sequence="3"/>
+
+    <!-- Products Menu -->
+    <menuitem id="shopify_products_menu"
+              name="Products"
+              parent="shopify_menu_root"
+              sequence="2"/>
+
+    <menuitem id="shopify_products_sub_menu"
+              name="Products"
+              parent="shopify_products_menu"
+              action="action_product_template_shopify"
+              sequence="1"/>
+
+    <menuitem id="shopify_collections_menu"
+              name="Collections"
+              parent="shopify_products_menu"
+              action="action_shopify_collection"
+              sequence="2"/>
+
+    <menuitem id="shopify_inventory_menu"
+              name="Inventory"
+              parent="shopify_products_menu"
+              action="action_shopify_inventory_location"
+              sequence="3"/>
+
+    <menuitem id="shopify_gift_cards_menu"
+              name="Gift Cards"
+              parent="shopify_products_menu"
+              action="action_shopify_gift_card"
+              sequence="4"/>
+
+    <menuitem id="shopify_discounts_menu"
+              name="Discounts"
+              parent="shopify_products_menu"
+              action="action_shopify_discount"
+              sequence="5"/>
+
+    <!-- Operations Menu -->
+    <menuitem id="shopify_operations_menu"
+              name="Operations"
+              parent="shopify_menu_root"
+              action="action_shopify_operation"
+              sequence="90"/>
+
+    <!-- Analytics Menu -->
+    <menuitem id="shopify_analytics_menu"
+              name="Analytics"
+              parent="shopify_menu_root"
+              sequence="10"/>
+
+    <menuitem id="shopify_analytics_dashboard_menu"
+              name="Dashboard"
+              parent="shopify_analytics_menu"
+              action="action_shopify_analytics_dashboard"
+              sequence="1"/>
+
+    <!-- Advanced Features Menu -->
+    <menuitem id="shopify_advanced_menu"
+              name="Advanced"
+              parent="shopify_menu_root"
+              sequence="80"/>
+
+    <menuitem id="shopify_inventory_sync_menu"
+              name="Inventory Sync"
+              parent="shopify_advanced_menu"
+              action="action_shopify_inventory_sync"
+              sequence="1"/>
+
+    <menuitem id="shopify_scheduler_menu"
+              name="Sync Schedules"
+              parent="shopify_advanced_menu"
+              action="action_shopify_scheduler"
+              sequence="2"/>
+
+    <menuitem id="shopify_webhook_menu"
+              name="Webhooks"
+              parent="shopify_advanced_menu"
+              action="action_shopify_webhook"
+              sequence="3"/>
+
+    <menuitem id="shopify_sync_log_menu"
+              name="Sync Logs"
+              parent="shopify_advanced_menu"
+              action="action_shopify_sync_log"
+              sequence="4"/>
+
+    <!-- Payments Menu -->
+    <menuitem id="shopify_payments_menu"
+              name="Payments"
+              parent="shopify_menu_root"
+              sequence="70"/>
+
+    <menuitem id="shopify_payment_transaction_menu"
+              name="Payment Transactions"
+              parent="shopify_payments_menu"
+              action="action_shopify_payment_transaction"
+              sequence="1"/>
+
+    <!-- Configuration Menu -->
+    <menuitem id="shopify_configuration_menu"
+              name="Configuration"
+              parent="shopify_menu_root"
+              sequence="100"/>
+
+    <menuitem id="shopify_instance_menu"
+              name="Shopify Instances"
+              parent="shopify_configuration_menu"
+              action="action_shopify_instance"
+              sequence="1"/>
+
+</odoo>

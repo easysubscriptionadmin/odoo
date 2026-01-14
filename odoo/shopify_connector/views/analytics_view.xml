@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Analytics Dashboard Form View -->
+    <record id="view_shopify_analytics_form" model="ir.ui.view">
+        <field name="name">shopify.analytics.form</field>
+        <field name="model">shopify.analytics</field>
+        <field name="arch" type="xml">
+            <form string="Shopify Analytics Dashboard">
+                <header>
+                    <button name="refresh_analytics" type="object" string="Refresh Data" class="oe_highlight"/>
+                    <button name="fetch_shopify_reports" type="object" string="Fetch Shopify Reports" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="shopify_instance_id"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Sales Analytics" name="sales">
+                            <group>
+                                <group string="Revenue Metrics">
+                                    <field name="total_sales" widget="monetary"/>
+                                    <field name="total_orders"/>
+                                    <field name="average_order_value" widget="monetary"/>
+                                </group>
+                                <group string="Customer Metrics">
+                                    <field name="total_customers"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Order Status" name="orders">
+                            <group>
+                                <group string="Payment Status">
+                                    <field name="pending_orders"/>
+                                    <field name="paid_orders"/>
+                                </group>
+                                <group string="Fulfillment Status">
+                                    <field name="unfulfilled_orders"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Product Analytics" name="products">
+                            <group>
+                                <group string="Top Selling Products">
+                                    <field name="top_selling_products" widget="text" nolabel="1"/>
+                                </group>
+                                <group string="Inventory Alerts">
+                                    <field name="low_stock_products"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Analytics Action -->
+    <record id="action_shopify_analytics" model="ir.actions.act_window">
+        <field name="name">Shopify Analytics</field>
+        <field name="res_model">shopify.analytics</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

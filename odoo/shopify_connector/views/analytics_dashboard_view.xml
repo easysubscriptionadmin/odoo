@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Analytics Dashboard Form View -->
+    <record id="view_shopify_analytics_dashboard_form" model="ir.ui.view">
+        <field name="name">shopify.analytics.dashboard.form</field>
+        <field name="model">shopify.analytics</field>
+        <field name="arch" type="xml">
+            <form string="Shopify Analytics Dashboard">
+                <header>
+                    <button name="refresh_analytics" type="object" string="Refresh Analytics" class="oe_highlight"/>
+                    <button name="fetch_shopify_reports" type="object" string="Generate Report" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Shopify Analytics Dashboard</h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="shopify_instance_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="date_from"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="date_to"/>
+                        </group>
+                    </group>
+
+                    <!-- KPI Cards using standard Odoo widgets -->
+                    <div class="o_group o_group_col_12">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 o_setting_box">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <div class="text-muted">Total Sales</div>
+                                    <div class="row mt8">
+                                        <div class="col-12">
+                                            <field name="total_sales" widget="monetary" class="text-success" style="font-size: 24px; font-weight: bold;"/>
+                                        </div>
+                                    </div>
+                                    <div class="text-muted small">
+                                        Growth: <field name="total_revenue_growth" widget="percentage" class="text-success"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6 o_setting_box">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <div class="text-muted">Total Orders</div>
+                                    <div class="row mt8">
+                                        <div class="col-12">
+                                            <field name="total_orders" class="text-primary" style="font-size: 24px; font-weight: bold;"/>
+                                        </div>
+                                    </div>
+                                    <div class="text-muted small">
+                                        Conversion: <field name="conversion_rate" widget="percentage" class="text-info"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6 o_setting_box">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <div class="text-muted">Avg Order Value</div>
+                                    <div class="row mt8">
+                                        <div class="col-12">
+                                            <field name="average_order_value" widget="monetary" class="text-info" style="font-size: 24px; font-weight: bold;"/>
+                                        </div>
+                                    </div>
+                                    <div class="text-muted small">
+                                        Items Sold: <field name="total_items_sold"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6 o_setting_box">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <div class="text-muted">Total Customers</div>
+                                    <div class="row mt8">
+                                        <div class="col-12">
+                                            <field name="total_customers" class="text-warning" style="font-size: 24px; font-weight: bold;"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Tabs -->
+                    <notebook>
+                        <!-- Order Analytics Page -->
+                        <page string="Order Analytics" name="order_analytics">
+                            <group>
+                                <group string="Order Status">
+                                    <field name="paid_orders" widget="statinfo"/>
+                                    <field name="pending_orders" widget="statinfo"/>
+                                    <field name="cancelled_orders" widget="statinfo"/>
+                                </group>
+                                <group string="Fulfillment Status">
+                                    <field name="fulfilled_orders" widget="statinfo"/>
+                                    <field name="unfulfilled_orders" widget="statinfo"/>
+                                </group>
+                            </group>
+                            <div class="mt-3">
+                                <button name="action_view_recent_orders" type="object" string="View All Orders" class="oe_highlight" icon="fa-shopping-cart"/>
+                            </div>
+                        </page>
+
+                        <!-- Product Analytics Page -->
+                        <page string="Product Analytics" name="product_analytics">
+                            <group>
+                                <group string="Product Statistics">
+                                    <field name="total_products"/>
+                                    <field name="low_stock_products"/>
+                                    <field name="total_items_sold"/>
+                                </group>
+                                <group string="Collections &amp; Marketing">
+                                    <field name="total_collections"/>
+                                    <field name="total_discounts"/>
+                                    <field name="active_discounts"/>
+                                </group>
+                            </group>
+                            <div class="mt-3">
+                                <button name="action_view_top_products" type="object" string="View Top Products" class="oe_highlight" icon="fa-star"/>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Dashboard Action -->
+    <record id="action_shopify_analytics_dashboard" model="ir.actions.act_window">
+        <field name="name">Analytics Dashboard</field>
+        <field name="res_model">shopify.analytics</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_shopify_analytics_dashboard_form"/>
+        <field name="target">current</field>
+    </record>
+
+    <!-- Top Products Kanban View -->
+    <record id="view_shopify_top_products_kanban" model="ir.ui.view">
+        <field name="name">shopify.top.products.kanban</field>
+        <field name="model">product.product</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id"/>
+                <field name="name"/>
+                <field name="list_price"/>
+                <field name="image_128"/>
+                <field name="qty_available"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('product.product', 'image_128', record.id.raw_value)" alt="Product" class="o_image_128_max"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </strong>
+                                <div class="o_kanban_record_subtitle">
+                                    <field name="default_code"/>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <field name="list_price" widget="monetary"/>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <span class="badge badge-pill badge-info">
+                                            Stock: <field name="qty_available"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Top Products List View -->
+    <record id="view_shopify_top_products_list" model="ir.ui.view">
+        <field name="name">shopify.top.products.list</field>
+        <field name="model">product.product</field>
+        <field name="arch" type="xml">
+            <list string="Top Selling Products" decoration-danger="qty_available &lt; 10">
+                <field name="image_128" widget="image" class="oe_avatar"/>
+                <field name="name"/>
+                <field name="default_code"/>
+                <field name="categ_id"/>
+                <field name="list_price" widget="monetary"/>
+                <field name="qty_available"/>
+                <field name="virtual_available"/>
+                <field name="uom_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Recent Orders Kanban View -->
+    <record id="view_shopify_recent_orders_kanban" model="ir.ui.view">
+        <field name="name">shopify.recent.orders.kanban</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" default_group_by="state">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="amount_total"/>
+                <field name="state"/>
+                <field name="date_order"/>
+                <field name="shopify_financial_status"/>
+                <field name="shopify_fulfillment_status"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                    </div>
+                                    <span class="float-end badge badge-pill" t-attf-class="badge-#{record.state.raw_value == 'sale' ? 'success' : record.state.raw_value == 'draft' ? 'secondary' : 'warning'}">
+                                        <field name="state"/>
+                                    </span>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <field name="partner_id"/>
+                                    <div class="text-muted">
+                                        <i class="fa fa-clock-o" title="Order Date"/> <field name="date_order" widget="date"/>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="amount_total" widget="monetary"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <span t-if="record.shopify_financial_status.raw_value" class="badge badge-success">
+                                            <field name="shopify_financial_status"/>
+                                        </span>
+                                        <span t-if="record.shopify_fulfillment_status.raw_value" class="badge badge-info ml-1">
+                                            <field name="shopify_fulfillment_status"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Recent Orders List View -->
+    <record id="view_shopify_recent_orders_list" model="ir.ui.view">
+        <field name="name">shopify.recent.orders.list</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <list string="Recent Orders" decoration-info="state == 'draft'" decoration-success="state == 'sale'" decoration-muted="state == 'cancel'">
+                <field name="name" string="Order #"/>
+                <field name="date_order" widget="date"/>
+                <field name="partner_id"/>
+                <field name="user_id" optional="show"/>
+                <field name="amount_total" widget="monetary" sum="Total"/>
+                <field name="shopify_financial_status" optional="show"/>
+                <field name="shopify_fulfillment_status" optional="show"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'sale'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Action for Top Products with Kanban and List Views -->
+    <record id="action_shopify_top_products_analytics" model="ir.actions.act_window">
+        <field name="name">Top Selling Products</field>
+        <field name="res_model">product.product</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_shopify_top_products_kanban')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_shopify_top_products_list')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No products found
+            </p>
+            <p>
+                View your top selling products based on order data from the selected date range.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action for Recent Orders with Kanban and List Views -->
+    <record id="action_shopify_recent_orders_analytics" model="ir.actions.act_window">
+        <field name="name">Recent Orders</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_shopify_recent_orders_kanban')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_shopify_recent_orders_list')})]"/>
+        <field name="context">{'search_default_sales': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No orders found
+            </p>
+            <p>
+                View recent orders from your Shopify store based on the selected date range.
+            </p>
+        </field>
+    </record>
+
+</odoo>

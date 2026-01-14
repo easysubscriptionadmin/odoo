@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sale Order Form View - Add Shopify Tab -->
+    <record id="view_order_form_shopify" model="ir.ui.view">
+        <field name="name">sale.order.form.shopify</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Shopify" name="shopify" invisible="is_shopify_order == False and shopify_instance_id == False">
+                    <group>
+                        <group>
+                            <field name="is_shopify_order"/>
+                            <field name="shopify_instance_id"/>
+                            <field name="shopify_order_id" readonly="1"/>
+                            <field name="shopify_order_number" readonly="1"/>
+                            <field name="shopify_financial_status"/>
+                            <field name="shopify_fulfillment_status"/>
+                        </group>
+                        <group>
+                            <field name="shopify_total_tax" readonly="1"/>
+                            <field name="shopify_total_shipping" readonly="1"/>
+                            <field name="shopify_currency" readonly="1"/>
+                            <field name="shopify_cancel_reason" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Sync Information">
+                        <group>
+                            <field name="shopify_created_at" readonly="1"/>
+                            <field name="shopify_updated_at" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="shopify_closed_at" readonly="1"/>
+                            <field name="shopify_cancelled_at" readonly="1"/>
+                        </group>
+                    </group>
+                    <separator string="Payment Transactions" invisible="not shopify_transaction_ids"/>
+                    <field name="shopify_transaction_ids" nolabel="1" invisible="not shopify_transaction_ids"/>
+                    <div class="oe_chatter">
+                        <button name="export_order_to_shopify"
+                                type="object"
+                                string="Export to Shopify (Draft Order)"
+                                class="oe_highlight"
+                                invisible="shopify_instance_id == False or state != 'draft'"/>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Sale Order List View - Add Shopify Fields -->
+    <record id="view_order_list_shopify" model="ir.ui.view">
+        <field name="name">sale.order.list.shopify</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='amount_total']" position="after">
+                <field name="is_shopify_order" optional="hide"/>
+                <field name="shopify_order_number" optional="show"/>
+                <field name="shopify_financial_status" optional="show"/>
+                <field name="shopify_fulfillment_status" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Shopify Quotations Custom List View with Products -->
+    <record id="view_shopify_quotation_tree" model="ir.ui.view">
+        <field name="name">sale.order.shopify.quotation.tree</field>
+        <field name="model">sale.order</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <list string="Shopify Quotations" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'">
+                <field name="name" string="Order"/>
+                <field name="shopify_order_number" string="Shopify #"/>
+                <field name="partner_id" string="Customer"/>
+                <field name="date_order" string="Order Date"/>
+                <field name="order_line" widget="many2many_tags" string="Products">
+                    <list>
+                        <field name="product_id"/>
+                        <field name="product_uom_qty"/>
+                        <field name="price_unit"/>
+                    </list>
+                </field>
+                <field name="amount_total" string="Total" sum="Total"/>
+                <field name="shopify_financial_status" string="Payment"/>
+                <field name="shopify_fulfillment_status" string="Fulfillment"/>
+                <field name="state" invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Shopify Quotations Custom Form View with Products -->
+    <record id="view_shopify_quotation_form" model="ir.ui.view">
+        <field name="name">sale.order.shopify.quotation.form</field>
+        <field name="model">sale.order</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <form string="Shopify Quotation">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,sent,sale"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id" string="Customer"/>
+                            <field name="date_order" string="Order Date"/>
+                            <field name="shopify_order_number" string="Shopify Order #"/>
+                            <field name="shopify_instance_id" string="Store"/>
+                        </group>
+                        <group>
+                            <field name="shopify_financial_status" string="Payment Status"/>
+                            <field name="shopify_fulfillment_status" string="Fulfillment Status"/>
+                            <field name="amount_total" string="Total Amount"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Order Lines" name="order_lines">
+                            <field name="order_line" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id" string="Product"/>
+                                    <field name="name" string="Description"/>
+                                    <field name="product_uom_qty" string="Quantity"/>
+                                    <field name="price_unit" string="Unit Price"/>
+                                    <field name="price_subtotal" string="Subtotal" sum="Total"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="amount_untaxed" string="Untaxed Amount"/>
+                                <field name="amount_tax" string="Taxes"/>
+                                <field name="amount_total" string="Total" class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                        <page string="Shopify Info" name="shopify_info">
+                            <group>
+                                <group>
+                                    <field name="shopify_order_id"/>
+                                    <field name="shopify_created_at"/>
+                                    <field name="shopify_updated_at"/>
+                                </group>
+                                <group>
+                                    <field name="shopify_total_tax"/>
+                                    <field name="shopify_total_shipping"/>
+                                    <field name="shopify_currency"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Customer Info" name="customer_info">
+                            <group>
+                                <group>
+                                    <field name="partner_shipping_id" string="Shipping Address"/>
+                                </group>
+                                <group>
+                                    <field name="partner_invoice_id" string="Invoice Address"/>
+                                </group>
+                            </group>
+                            <field name="note" string="Notes" placeholder="Order notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Sale Order Search View - Add Shopify Filters -->
+    <record id="view_order_search_shopify" model="ir.ui.view">
+        <field name="name">sale.order.search.shopify</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+                <separator/>
+                <filter string="Shopify Orders" name="shopify_orders" domain="[('is_shopify_order', '=', True)]"/>
+                <filter string="Non-Shopify Orders" name="non_shopify_orders" domain="[('is_shopify_order', '=', False)]"/>
+                <separator/>
+                <filter string="Paid" name="paid" domain="[('shopify_financial_status', '=', 'paid')]"/>
+                <filter string="Pending Payment" name="pending" domain="[('shopify_financial_status', '=', 'pending')]"/>
+                <filter string="Fulfilled" name="fulfilled" domain="[('shopify_fulfillment_status', '=', 'fulfilled')]"/>
+                <filter string="Unfulfilled" name="unfulfilled" domain="[('shopify_fulfillment_status', '=', 'unfulfilled')]"/>
+                <separator/>
+                <field name="shopify_instance_id"/>
+                <field name="shopify_order_id"/>
+                <field name="shopify_order_number"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Shopify Quotations Action -->
+    <record id="action_order_quotation_shopify" model="ir.actions.act_window">
+        <field name="name">Shopify Quotations</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">list,form,kanban</field>
+        <field name="domain">[('is_shopify_order', '=', True), ('state', 'in', ['draft', 'sent'])]</field>
+        <field name="context">{'search_default_shopify_orders': 1}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_shopify_quotation_tree')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_shopify_quotation_form')})]"/>
+    </record>
+
+    <!-- Shopify Orders Action with Custom Views -->
+    <record id="action_sale_order_shopify" model="ir.actions.act_window">
+        <field name="name">Shopify Orders</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">list,form,kanban</field>
+        <field name="domain">[('is_shopify_order', '=', True), ('state', 'not in', ['draft', 'sent', 'cancel'])]</field>
+        <field name="context">{'search_default_shopify_orders': 1}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_shopify_quotation_tree')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_shopify_quotation_form')})]"/>
+    </record>
+
+</odoo>

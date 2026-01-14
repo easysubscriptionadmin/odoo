@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Collection List View -->
+    <record id="view_shopify_collection_list" model="ir.ui.view">
+        <field name="name">shopify.collection.list</field>
+        <field name="model">shopify.collection</field>
+        <field name="arch" type="xml">
+            <list string="Shopify Collections">
+                <field name="name"/>
+                <field name="shopify_instance_id"/>
+                <field name="collection_type"/>
+                <field name="product_count"/>
+                <field name="published" widget="boolean_toggle"/>
+                <field name="shopify_collection_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Collection Form View -->
+    <record id="view_shopify_collection_form" model="ir.ui.view">
+        <field name="name">shopify.collection.form</field>
+        <field name="model">shopify.collection</field>
+        <field name="arch" type="xml">
+            <form string="Shopify Collection">
+                <header>
+                    <button name="sync_from_shopify" type="object" string="Sync All Collections" class="oe_highlight"/>
+                    <button name="action_fetch_products" type="object" string="Fetch Products" class="btn-secondary"
+                            invisible="not shopify_collection_id"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" icon="fa-cubes" type="object" name="action_fetch_products"
+                                invisible="not shopify_collection_id">
+                            <field name="product_count" widget="statinfo" string="Products"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Collection Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="shopify_instance_id"/>
+                            <field name="shopify_collection_id" readonly="1"/>
+                            <field name="collection_type"/>
+                        </group>
+                        <group>
+                            <field name="published"/>
+                            <field name="published_scope"/>
+                            <field name="sort_order"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Products" name="products">
+                            <div class="alert alert-info" role="alert" invisible="product_ids">
+                                <strong>No products yet!</strong> Click "Fetch Products" button to load products from Shopify.
+                            </div>
+                            <field name="product_ids" nolabel="1">
+                                <list>
+                                    <field name="image_128" widget="image" class="oe_avatar"/>
+                                    <field name="name"/>
+                                    <field name="default_code" string="SKU"/>
+                                    <field name="shopify_product_type" optional="show"/>
+                                    <field name="list_price" widget="monetary"/>
+                                    <field name="qty_available" string="Stock" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Details" name="details">
+                            <group>
+                                <group>
+                                    <field name="image_url" widget="url"/>
+                                </group>
+                                <group>
+                                    <field name="shopify_created_at" readonly="1"/>
+                                    <field name="shopify_updated_at" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Collection Action -->
+    <record id="action_shopify_collection" model="ir.actions.act_window">
+        <field name="name">Shopify Collections</field>
+        <field name="res_model">shopify.collection</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No collections found
+            </p>
+            <p>
+                Collections help organize your products. Create a collection and sync it with Shopify.
+            </p>
+        </field>
+    </record>
+</odoo>

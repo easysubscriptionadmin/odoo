@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Scheduler Form View -->
+    <record id="view_shopify_scheduler_form" model="ir.ui.view">
+        <field name="name">shopify.scheduler.form</field>
+        <field name="model">shopify.scheduler</field>
+        <field name="arch" type="xml">
+            <form string="Automated Sync Scheduler">
+                <header>
+                    <button name="action_run_now" type="object" string="Run Now" class="oe_highlight"
+                            invisible="is_running == True"/>
+                    <field name="is_running" widget="boolean" invisible="is_running == False"/>
+                    <span class="badge text-bg-warning" invisible="is_running == False">Sync in Progress...</span>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active == True"/>
+                    <widget name="web_ribbon" title="Running" bg_color="text-bg-warning"
+                            invisible="is_running == False"/>
+                    <div class="oe_title">
+                        <label for="name" string="Schedule Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g., Daily Product Sync"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="shopify_instance_id"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                        <group>
+                            <field name="interval_number"/>
+                            <field name="interval_type"/>
+                        </group>
+                    </group>
+
+                    <group string="Sync Configuration">
+                        <group>
+                            <field name="sync_products" widget="boolean_toggle"/>
+                            <field name="sync_customers" widget="boolean_toggle"/>
+                            <field name="sync_orders" widget="boolean_toggle"/>
+                            <field name="sync_inventory" widget="boolean_toggle"/>
+                        </group>
+                        <group>
+                            <field name="sync_collections" widget="boolean_toggle"/>
+                            <field name="sync_gift_cards" widget="boolean_toggle"/>
+                            <field name="sync_locations" widget="boolean_toggle"/>
+                            <field name="sync_discounts" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <group string="Last Run Information">
+                        <group>
+                            <field name="last_run" readonly="1"/>
+                            <field name="next_run" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="last_run_status" readonly="1"/>
+                            <field name="cron_id" readonly="1" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Last Run Details" invisible="last_run_message == False">
+                        <field name="last_run_message" widget="text" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Scheduler List View -->
+    <record id="view_shopify_scheduler_list" model="ir.ui.view">
+        <field name="name">shopify.scheduler.list</field>
+        <field name="model">shopify.scheduler</field>
+        <field name="arch" type="xml">
+            <list string="Sync Schedules">
+                <field name="name"/>
+                <field name="shopify_instance_id"/>
+                <field name="interval_number"/>
+                <field name="interval_type"/>
+                <field name="last_run"/>
+                <field name="next_run"/>
+                <field name="last_run_status" decoration-success="last_run_status == 'success'"
+                       decoration-warning="last_run_status == 'partial'"
+                       decoration-danger="last_run_status == 'failed'"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Scheduler Action -->
+    <record id="action_shopify_scheduler" model="ir.actions.act_window">
+        <field name="name">Sync Schedules</field>
+        <field name="res_model">shopify.scheduler</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first automated sync schedule
+            </p>
+            <p>
+                Set up automatic synchronization between Odoo and Shopify.
+            </p>
+        </field>
+    </record>
+
+</odoo>

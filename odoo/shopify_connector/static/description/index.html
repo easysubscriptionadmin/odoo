@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Easycomm Shopify Connector</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            background: url('./images/bg-header.png') no-repeat center center;
+            background-size: cover;
+            border-radius: 20px;
+            padding: 60px 80px;
+            position: relative;
+            overflow: hidden;
+            min-height: 500px;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: 52px;
+            font-weight: 700;
+            color: white;
+            line-height: 1.15;
+            margin-bottom: 25px;
+        }
+
+        .hero-subtitle {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .hero-subtitle-text {
+            color: white;
+            font-size: 18px;
+            font-weight: 400;
+        }
+
+        .odoo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+
+        .odoo-badge .odoo-text {
+            color: #666;
+            font-size: 18px;
+        }
+
+        .odoo-badge .version {
+            background: #875A7B;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Integration Boxes */
+        .integration-boxes {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-top: 30px;
+        }
+
+        .integration-box {
+            width: 140px;
+            height: 140px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .integration-box svg {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 12px;
+        }
+
+        .integration-box span {
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .sync-icon {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sync-icon svg {
+            width: 30px;
+            height: 30px;
+            fill: white;
+            opacity: 0.8;
+        }
+
+        /* Key Benefits Bar */
+        .benefits-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 35px;
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+
+        .benefits-label {
+            font-style: italic;
+            color: #555;
+            font-size: 15px;
+            padding-right: 20px;
+            border-right: 2px solid #ddd;
+        }
+
+        .benefits-list {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .benefit-item {
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            cursor: default;
+        }
+
+        .benefit-item.active {
+            background: #875A7B;
+            color: white;
+        }
+
+        /* Screenshot Section */
+        .screenshot-section {
+            text-align: center;
+            margin: 50px 0;
+        }
+
+        .screenshot-caption {
+            font-style: italic;
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 25px;
+        }
+
+        .browser-mockup {
+            background: linear-gradient(180deg, #e8e0e8 0%, #d8d0d8 100%);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .browser-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: #f5f5f5;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .browser-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .browser-dot.red { background: #ff5f57; }
+        .browser-dot.yellow { background: #ffbd2e; }
+        .browser-dot.green { background: #28c940; }
+
+        .browser-content {
+            background: white;
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+        }
+
+        .browser-content img {
+            width: 100%;
+            display: block;
+        }
+
+        /* Safari Browser Mockup */
+        .browser-mockup-safari {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .safari-chrome {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background: #e8e8e8;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .safari-chrome-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .safari-btn {
+            color: #999;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .safari-nav-arrows {
+            display: flex;
+            gap: 8px;
+            margin-left: 10px;
+            color: #999;
+            font-size: 16px;
+        }
+
+        .safari-url-bar {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 6px 15px;
+            border-radius: 6px;
+            margin: 0 20px;
+            font-size: 12px;
+        }
+
+        .url-shield {
+            font-size: 14px;
+        }
+
+        .url-address {
+            flex: 1;
+            color: #333;
+        }
+
+        .url-refresh {
+            color: #999;
+        }
+
+        .safari-chrome-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Odoo Apps Grid */
+        .odoo-apps-mockup {
+            background: #d4c8d9;
+            border-radius: 0 0 8px 8px;
+            padding: 30px 50px 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .curve-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .odoo-apps-mockup > *:not(.curve-overlay) {
+            position: relative;
+            z-index: 1;
+        }
+
+        .warning-banner {
+            background: #fce8e8;
+            padding: 15px 40px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 35px;
+            font-size: 14px;
+            color: #333;
+            position: relative;
+        }
+
+        .warning-banner a {
+            color: #875A7B;
+            text-decoration: underline;
+        }
+
+        .warning-banner .close-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .odoo-apps-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 30px 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .app-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .app-icon-box {
+            width: 70px;
+            height: 70px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .app-icon-box img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+
+
+        .app-icon span {
+            font-size: 13px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        /* Features Section */
+        .features-section {
+            background: #F4F1F6;
+            padding: 50px 0 60px;
+            margin: 40px 0;
+            border-radius: 20px;
+        }
+
+        .section-title-wrapper {
+            position: relative;
+            margin: 0 0 40px;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .curly-decoration {
+            position: absolute;
+            left: 30px;
+            top: 0;
+            width: 40px;
+            height: 70px;
+        }
+
+        .curly-decoration svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Odoo Product Mockup */
+        .odoo-product-mockup {
+            background: white;
+            font-size: 12px;
+        }
+
+        .odoo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .odoo-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .odoo-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .odoo-logo svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .nav-item {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .odoo-header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px;
+        }
+
+        .header-icon {
+            font-size: 12px;
+        }
+
+        .company-name {
+            color: #333;
+            font-size: 13px;
+        }
+
+        .odoo-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: white;
+            border-bottom: 1px solid #eee;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .new-badge {
+            background: #875A7B;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .toolbar-title {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .toolbar-star {
+            color: #999;
+        }
+
+        .toolbar-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f5f5f5;
+            padding: 6px 15px;
+            border-radius: 6px;
+            border: 1px solid #e5e5e5;
+            min-width: 300px;
+        }
+
+        .search-icon {
+            font-size: 12px;
+        }
+
+        .search-filter {
+            background: #875A7B;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .search-text {
+            color: #999;
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        .product-card {
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+        }
+
+        .product-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .product-star {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .product-name {
+            font-weight: 500;
+            color: #333;
+            font-size: 12px;
+            line-height: 1.3;
+        }
+
+        .product-price {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .product-image {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 0;
+            padding: 0 30px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px 28px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: none;
+        }
+
+        .feature-icon {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 18px;
+        }
+
+        .feature-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: #333;
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .feature-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 14px;
+            letter-spacing: -0.2px;
+        }
+
+        .feature-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .feature-card li {
+            position: relative;
+            padding-left: 14px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        .feature-card li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #666;
+            font-size: 10px;
+            top: 2px;
+        }
+
+        /* Configuration Section */
+        .config-section {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 60px;
+            margin: 40px 0;
+            border: 2px solid #875A7B;
+            position: relative;
+        }
+
+        .config-section::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 30px;
+            bottom: 30px;
+            /* width: 4px; */
+            background: #875A7B;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .config-title {
+            font-size: 38px;
+            font-weight: 400;
+            color: #875A7B;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .config-steps {
+            list-style: none;
+            padding: 0;
+            padding-left: 10px;
+        }
+
+        .config-steps > li {
+            margin-bottom: 25px;
+            font-size: 16px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .config-steps > li > span.step-num {
+            color: #888;
+            margin-right: 8px;
+        }
+
+        .config-steps ul {
+            list-style: none;
+            padding-left: 35px;
+            margin-top: 18px;
+        }
+
+        .config-steps ul li {
+            margin-bottom: 15px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .config-steps ul li::before {
+            content: '·';
+            margin-right: 8px;
+            font-size: 20px;
+            color: #888;
+        }
+
+        .code-badge {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            color: #444;
+            border: 1px solid #e0e0e0;
+        }
+
+        /* Important Box */
+        .important-box {
+            background: #f5f5f5;
+            padding: 30px 35px;
+            border-radius: 16px;
+            margin-top: 40px;
+        }
+
+        .important-box p {
+            margin-bottom: 18px;
+            font-size: 15px;
+        }
+
+        .important-box strong {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .permissions-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .permission-badge {
+            background: #e8e8e8;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            color: #333;
+            border: none;
+        }
+
+        /* Additional Features */
+        .additional-features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .additional-feature-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+            border: 1px solid #f0f0f0;
+        }
+
+        .additional-feature-card .feature-icon {
+            margin-bottom: 15px;
+        }
+
+        .additional-feature-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .additional-feature-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .additional-feature-card li {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .additional-feature-card li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+        }
+
+        /* Support Section */
+        .support-section {
+            background: url('./images/footer-bg.png') no-repeat center center;
+            background-size: cover;
+            border-radius: 20px;
+            padding: 60px 80px;
+            margin: 50px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .support-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        .support-badge svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .support-title {
+            font-size: 42px;
+            font-weight: 600;
+            color: white;
+            line-height: 1.2;
+            margin-bottom: 35px;
+            max-width: 600px;
+        }
+
+        .contact-buttons {
+            display: flex;
+            gap: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .contact-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Version Info Section */
+        .version-section {
+            background: white;
+            border-radius: 16px;
+            padding: 40px 50px;
+            margin: 40px 0;
+            display: flex;
+            align-items: center;
+            gap: 80px;
+            border: 2px solid #875A7B;
+        }
+
+        .version-badge-large {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f5f5f5;
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .version-badge-large .odoo-text {
+            font-size: 28px;
+            color: #666;
+            font-weight: 400;
+        }
+
+        .version-badge-large .version-num {
+            background: #875A7B;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .version-info {
+            flex: 1;
+        }
+
+        .version-info h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #875A7B;
+            margin-bottom: 25px;
+        }
+
+        .version-info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .version-info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+        }
+
+        .version-info-item .icon {
+            width: 28px;
+            height: 28px;
+        }
+
+        .version-info-item .label {
+            color: #333;
+        }
+
+        .version-info-item .value {
+            color: #666;
+        }
+
+        .version-info-item .value.green {
+            color: #22c55e;
+        }
+
+        .version-info-item .value.purple {
+            color: #875A7B;
+        }
+
+        /* Order Mockup Styles */
+        .odoo-order-mockup {
+            background: white;
+            font-size: 12px;
+        }
+
+        .shopify-logo {
+            color: #0D9488;
+        }
+
+        .shopify-logo svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .order-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        .order-card {
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .order-amount {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-details {
+            color: #888;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .clock-icon {
+            font-size: 10px;
+        }
+
+        .quotation-badge {
+            background: #0D9488;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .avatar {
+            font-size: 16px;
+        }
+
+        /* Order Detail Mockup Styles */
+        .browser-mockup-full {
+            background: #f5f5f5;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .browser-chrome {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background: #e8e8e8;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .browser-chrome-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .browser-nav-btns {
+            display: flex;
+            gap: 5px;
+            margin-left: 15px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .nav-btn {
+            cursor: pointer;
+        }
+
+        .browser-url-bar {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            margin: 0 20px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .shield-icon {
+            font-size: 14px;
+        }
+
+        .url-text {
+            flex: 1;
+            color: #333;
+        }
+
+        .refresh-icon {
+            color: #999;
+        }
+
+        .browser-chrome-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .chrome-icon {
+            cursor: pointer;
+        }
+
+        .odoo-detail-mockup {
+            background: white;
+        }
+
+        .notification-red {
+            color: #EF4444 !important;
+            font-size: 10px !important;
+        }
+
+        .notification-orange {
+            color: #F97316 !important;
+            font-size: 10px !important;
+        }
+
+        .avatar-circle {
+            width: 24px;
+            height: 24px;
+            background: #e5e5e5;
+            border-radius: 50%;
+        }
+
+        .search-filter-text {
+            color: #333;
+            font-size: 12px;
+        }
+
+        .filter-close {
+            color: #999;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .dropdown-arrow {
+            color: #999;
+            font-size: 10px;
+        }
+
+        .flag-icon {
+            color: #875A7B;
+        }
+
+        .status-breadcrumb {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0;
+            padding: 10px 20px;
+            background: #f8f9fa;
+        }
+
+        .status-step {
+            padding: 8px 15px 8px 25px;
+            background: #f5f5f5;
+            font-size: 13px;
+            color: #888;
+            position: relative;
+            border: 1px solid #e0e0e0;
+            border-left: none;
+        }
+
+        .status-step:first-child {
+            border-left: 1px solid #e0e0e0;
+            padding-left: 15px;
+        }
+
+        .status-step::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 10px solid transparent;
+            border-left: 10px solid #f5f5f5;
+            z-index: 2;
+        }
+
+        .status-step::before {
+            content: '';
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 12px solid transparent;
+            border-left: 12px solid #e0e0e0;
+            z-index: 1;
+        }
+
+        .status-step:last-child::after,
+        .status-step:last-child::before {
+            display: none;
+        }
+
+        .status-step.active {
+            background: white;
+            font-weight: 500;
+            color: #333;
+            border-color: #ccc;
+        }
+
+        .status-step.active::after {
+            border-left-color: white;
+        }
+
+        .status-step.active::before {
+            border-left-color: #ccc;
+        }
+
+        .status-arrow {
+            display: none;
+        }
+
+        .order-detail-card {
+            background: white;
+            margin: 20px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 25px 30px;
+        }
+
+        .order-number {
+            font-size: 28px;
+            font-weight: 400;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        .order-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 12px;
+        }
+
+        .info-label {
+            width: 140px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .info-label sup {
+            color: #999;
+            font-size: 10px;
+        }
+
+        .info-value {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .info-value.amount {
+            font-weight: 600;
+        }
+
+        .detail-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid #e5e5e5;
+            margin-bottom: 0;
+        }
+
+        .detail-tabs .tab {
+            padding: 12px 20px;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+        }
+
+        .detail-tabs .tab.active {
+            color: #333;
+            border-bottom-color: #333;
+            font-weight: 500;
+        }
+
+        .order-lines-table {
+            margin-top: 0;
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr 1fr 1fr;
+            padding: 12px 15px;
+            background: #fafafa;
+            border-bottom: 1px solid #e5e5e5;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr 1fr 1fr;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+            color: #333;
+            align-items: center;
+        }
+
+        .table-row:hover {
+            background: #fafafa;
+        }
+
+        .drag-handle {
+            color: #ccc;
+            margin-right: 10px;
+            cursor: grab;
+        }
+
+        .col-quantity, .col-price, .col-subtotal {
+            text-align: right;
+        }
+
+        .col-quantity {
+            color: #0D9488;
+        }
+
+        .delete-icon {
+            color: #ccc;
+            font-size: 12px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        .add-line {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .add-line a {
+            color: #0D9488;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .order-totals {
+            padding: 20px 0;
+        }
+
+        .subtotal-row {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .totals-breakdown {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            padding: 15px;
+            gap: 8px;
+        }
+
+        .total-row {
+            display: flex;
+            gap: 30px;
+            font-size: 14px;
+        }
+
+        .total-label {
+            color: #666;
+            text-align: right;
+            min-width: 120px;
+        }
+
+        .total-value {
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .total-value.bold {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .total-row.final {
+            padding-top: 10px;
+            border-top: 1px solid #e5e5e5;
+            margin-top: 5px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Banner -->
+        <div class="hero-banner">
+            <div class="hero-content">
+                <h1 class="hero-title">Easycomm<br>Shopify Connector</h1>
+                <div class="hero-subtitle">
+                    <span class="hero-subtitle-text">Seamless Shopify Integration for</span>
+                    <span class="odoo-badge">
+                        <span class="odoo-text">Odoo</span>
+                        <span class="version">19.0</span>
+                    </span>
+                </div>
+                <div class="integration-boxes">
+                    <div class="integration-box">
+                        <img src="./icon.png" alt="" style=" width: 40px;
+            height: 40px;
+            object-fit: contain; border-radius: 8px;">
+                        <span>EASYCOMM</span>
+                    </div>
+                    <div class="sync-icon">
+                       <img src="./images/swap.png" alt="" style=" width: 40px;
+            height: 40px;
+            object-fit: contain; border-radius: 8px; color: white;">
+                    </div>
+                    <div class="integration-box">
+                         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE7uExqWdSgzIRTVz-mieoSY3jPALVxBVzwQ&s" alt="" style=" width: 40px;
+            height: 40px;
+            object-fit: contain; border-radius: 8px;">
+                        <span>ODOO</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Benefits Bar -->
+        <div class="benefits-bar">
+            <span class="benefits-label">Key Benefits:</span>
+            <div class="benefits-list">
+                <span class="benefit-item active">Bi-directional Sync</span>
+                <span class="benefit-item active">Real-time Webhooks</span>
+                <span class="benefit-item active">Multi-Store Support</span>
+                <span class="benefit-item active">Analytics Dashboard</span>
+            </div>
+        </div>
+
+        <!-- Odoo Apps Dashboard Screenshot -->
+        <div class="screenshot-section">
+            <p class="screenshot-caption">Comprehensive dashboard for managing your Shopify integration</p>
+            <div class="browser-mockup-safari">
+                <div class="safari-chrome">
+                    <div class="safari-chrome-left">
+                        <span class="browser-dot red"></span>
+                        <span class="browser-dot yellow"></span>
+                        <span class="browser-dot green"></span>
+                        <span class="safari-btn">☐</span>
+                        <span class="safari-nav-arrows">
+                            <span>‹</span>
+                            <span>›</span>
+                        </span>
+                    </div>
+                    <div class="safari-url-bar">
+                        <span class="url-shield">🛡</span>
+                        <span class="url-address">https://transcendent-praline-9429fe.netlify.app/</span>
+                        <span class="url-refresh">↻</span>
+                    </div>
+                    <div class="safari-chrome-right">
+                        <span class="safari-btn">⊕</span>
+                        <span class="safari-btn">⬆</span>
+                        <span class="safari-btn">+</span>
+                        <span class="safari-btn">☐</span>
+                    </div>
+                </div>
+                <div class="odoo-apps-mockup">
+                    <!-- Curved Overlay -->
+                    <svg class="curve-overlay" viewBox="0 0 800 500" preserveAspectRatio="none">
+                        <path d="M0,0 L0,500 Q300,400 400,0 Z" fill="rgba(232, 225, 238, 0.6)"/>
+                        <path d="M0,0 L0,350 Q200,300 300,0 Z" fill="rgba(240, 235, 243, 0.5)"/>
+                    </svg>
+                 
+                    <div class="odoo-apps-grid">
+                        <!-- Row 1 -->
+                        <div class="app-icon">
+                            <div class="app-icon-box">
+                                <img src="https://download.odoocdn.com/icons/membership/static/description/icon-hi.png" alt="">
+                            </div>
+                            <span>Discuss</span>
+                        </div>
+                        <div class="app-icon">
+                            <div class="app-icon-box">
+                                <img src="https://download.odoocdn.com/icons/contacts/static/description/icon.svg" alt="">
+                            </div>
+                            <span>Contacts</span>
+                        </div>
+                        <div class="app-icon">
+                            <div class="app-icon-box">
+                               <img src="./icon.png" alt="">
+                            </div>
+                            <span>Shopify</span>
+                        </div>
+                        <div class="app-icon">
+                            <div class="app-icon-box">
+                              <img src="https://download.odoocdn.com/icons/sale/static/description/icon-hi.png" alt="">
+                            </div>
+                            <span>Sales</span>
+                        </div>
+                        <div class="app-icon">
+                            <div class="app-icon-box">
+                               <img src="https://download.odoocdn.com/icons/spreadsheet_dashboard/static/description/icon-hi.png" alt="">
+                            </div>
+                            <span>Dashboards</span>
+                        </div>
+                        <div class="app-icon">
+                            <div class="app-icon-box">
+                               <img src="https://download.odoocdn.com/icons/accountant/static/description/icon-hi.png" alt="">
+                            </div>
+                            <span>Accounting</span>
+                        </div>
+                        <!-- Row 2 -->
+                        <div class="app-icon">
+                            <div class="app-icon-box">
+                                  <img src="https://download.odoocdn.com/icons/industry_fsm_stock/static/description/icon-hi.png" alt="">
+                            </div>
+                            <span>Inventory</span>
+                        </div>
+                        <div class="app-icon">
+                            <div class="app-icon-box">
+                                <img src="https://download.odoocdn.com/icons/stock_barcode/static/description/icon-hi.png" alt="">
+                            </div>
+                            <span>Barcode</span>
+                        </div>
+                        <div class="app-icon">
+                            <div class="app-icon-box">
+                               <img src="https://download.odoocdn.com/icons/apps/static/description/icon-hi.png" alt="">
+                            </div>
+                            <span>Link Tracker</span>
+                        </div>
+                        <div class="app-icon">
+                            <div class="app-icon-box">
+                               <img src="https://download.odoocdn.com/icons/apps/static/description/icon-hi.png" alt="">
+                            </div>
+                            <span>Apps</span>
+                        </div>
+                        <div class="app-icon">
+                            <div class="app-icon-box">
+                                <img src="https://download.odoocdn.com/icons/settings/static/description/icon-hi.png" alt="">
+                            </div>
+                            <span>Settings</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="features-section">
+          <div class="browser-content">
+                    <img src="./images/feature.png" alt="">
+                </div>
+        </div>
+
+        <!-- Product Screenshot -->
+        <div class="screenshot-section">
+            
+                <div class="browser-content">
+                    <img src="./images/products.png" alt="">
+                </div>
+          
+         
+        </div>
+
+        <!-- Configuration Section -->
+        <div class="config-section">
+            <h2 class="config-title">Configuration</h2>
+            <ol class="config-steps">
+                <li><span class="step-num">1.</span> Navigate to <strong>Shopify > Configuration > Shopify Instances</strong></li>
+                <li>
+                    <span class="step-num">2.</span> Create a new instance with your Shopify credentials:
+                    <ul>
+                        <li>Store URL: <span class="code-badge">your-store.myshopify.com</span></li>
+                        <li>API Access Token (from Shopify Admin)</li>
+                        <li>API Version (default: 2024-01)</li>
+                    </ul>
+                </li>
+                <li><span class="step-num">3.</span> Click <strong>Test Connection</strong> to verify</li>
+                <li><span class="step-num">4.</span> Start syncing your data!</li>
+            </ol>
+
+            <div class="important-box">
+                <p><strong>Important:</strong> Ensure your Shopify API credentials have the necessary permissions</p>
+                <div class="permissions-grid">
+                    <span class="permission-badge">read_products,</span>
+                    <span class="permission-badge">write_products,</span>
+                    <span class="permission-badge">read_customers,</span>
+                    <span class="permission-badge">write_customers,</span>
+                    <span class="permission-badge">read_orders,</span>
+                    <span class="permission-badge">write_orders,</span>
+                    <span class="permission-badge">read_inventory,</span>
+                    <span class="permission-badge">write_inventory,</span>
+                    <span class="permission-badge">read_locations</span>
+                </div>
+            </div>
+
+            <!-- Order Screenshot -->
+            <div class="screenshot-section" style="margin-top: 30px;">
+                <div class="browser-mockup">
+                <div class="browser-header">
+                    <span class="browser-dot red"></span>
+                    <span class="browser-dot yellow"></span>
+                    <span class="browser-dot green"></span>
+                </div>
+                <div class="browser-content">
+                    <div class="odoo-order-mockup">
+                        <!-- Odoo Header -->
+                        <div class="odoo-header">
+                            <div class="odoo-nav">
+                                <span class="odoo-logo shopify-logo">
+                                    <svg viewBox="0 0 20 20" fill="none">
+                                        <rect width="20" height="20" rx="4" fill="#0D9488"/>
+                                        <circle cx="10" cy="10" r="6" stroke="white" stroke-width="2" fill="none"/>
+                                        <path d="M7 10c0 0 1.5 0 3 0s2-2.5 1-2.5-2.5 1.5-2.5 2.5 1.5 2.5 2.5 2.5 3-1.5 3-2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                                    </svg>
+                                    Shopify
+                                </span>
+                                <span class="nav-item">Sales</span>
+                                <span class="nav-item">Products</span>
+                                <span class="nav-item">Analytics</span>
+                                <span class="nav-item">Payments</span>
+                                <span class="nav-item">Advanced</span>
+                                <span class="nav-item">Operations</span>
+                                <span class="nav-item">Configuration</span>
+                            </div>
+                            <div class="odoo-header-right">
+                                <span class="header-icon" style="color: #EF4444;">●</span>
+                                <span class="header-icon" style="color: #F97316;">●</span>
+                                <span class="header-icon">⚙</span>
+                                <span class="company-name">My Company</span>
+                                <span class="avatar">👤</span>
+                            </div>
+                        </div>
+                        <!-- Toolbar -->
+                        <div class="odoo-toolbar">
+                            <div class="toolbar-left">
+                                <span class="new-badge" style="background: #0D9488;">New</span>
+                                <span class="toolbar-title">Shopify Quotations</span>
+                                <span class="toolbar-star">☆</span>
+                            </div>
+                            <div class="toolbar-center">
+                                <div class="search-box">
+                                    <span class="search-icon">🔍</span>
+                                    <span class="search-filter" style="background: #0D9488;">T Shopify Orders ✕</span>
+                                    <span class="search-text">Search...</span>
+                                </div>
+                            </div>
+                            <div class="toolbar-right">
+                                <span class="pagination">1-80 / 2477</span>
+                                <span class="nav-arrows">‹ ›</span>
+                                <span class="view-icons">▣ ≡</span>
+                            </div>
+                        </div>
+                        <!-- Order Grid -->
+                        <div class="order-grid">
+                            <!-- Row 1 -->
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <span class="customer-name">Brian Thompson</span>
+                                    <span class="order-amount">₹ 507.8</span>
+                                </div>
+                                <div class="order-footer">
+                                    <span class="order-details">S02753 Jan 13, 6:29 AM <span class="clock-icon">⏱</span></span>
+                                    <span class="quotation-badge">Quotation</span>
+                                </div>
+                            </div>
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <span class="customer-name">Jessica Martinez</span>
+                                    <span class="order-amount">₹ 507.8</span>
+                                </div>
+                                <div class="order-footer">
+                                    <span class="order-details">S02753 Jan 13, 6:29 AM <span class="clock-icon">⏱</span></span>
+                                    <span class="quotation-badge">Quotation</span>
+                                </div>
+                            </div>
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <span class="customer-name">Kevin Anderson</span>
+                                    <span class="order-amount">₹ 507.8</span>
+                                </div>
+                                <div class="order-footer">
+                                    <span class="order-details">S02753 Jan 13, 6:29 AM <span class="clock-icon">⏱</span></span>
+                                    <span class="quotation-badge">Quotation</span>
+                                </div>
+                            </div>
+                            <!-- Row 2 -->
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <span class="customer-name">Nicole Harris</span>
+                                    <span class="order-amount">₹ 507.8</span>
+                                </div>
+                                <div class="order-footer">
+                                    <span class="order-details">S02753 Jan 13, 6:29 AM <span class="clock-icon">⏱</span></span>
+                                    <span class="quotation-badge">Quotation</span>
+                                </div>
+                            </div>
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <span class="customer-name">Carlos Rodriguez</span>
+                                    <span class="order-amount">₹ 507.8</span>
+                                </div>
+                                <div class="order-footer">
+                                    <span class="order-details">S02753 Jan 13, 6:29 AM <span class="clock-icon">⏱</span></span>
+                                    <span class="quotation-badge">Quotation</span>
+                                </div>
+                            </div>
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <span class="customer-name">Aisha Williams</span>
+                                    <span class="order-amount">₹ 507.8</span>
+                                </div>
+                                <div class="order-footer">
+                                    <span class="order-details">S02753 Jan 13, 6:29 AM <span class="clock-icon">⏱</span></span>
+                                    <span class="quotation-badge">Quotation</span>
+                                </div>
+                            </div>
+                            <!-- Row 3 -->
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <span class="customer-name">Daniel Nguyen</span>
+                                    <span class="order-amount">₹ 507.8</span>
+                                </div>
+                                <div class="order-footer">
+                                    <span class="order-details">S02753 Jan 13, 6:29 AM <span class="clock-icon">⏱</span></span>
+                                    <span class="quotation-badge">Quotation</span>
+                                </div>
+                            </div>
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <span class="customer-name">Marcus Robinson</span>
+                                    <span class="order-amount">₹ 507.8</span>
+                                </div>
+                                <div class="order-footer">
+                                    <span class="order-details">S02753 Jan 13, 6:29 AM <span class="clock-icon">⏱</span></span>
+                                    <span class="quotation-badge">Quotation</span>
+                                </div>
+                            </div>
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <span class="customer-name">Mihir Acharya</span>
+                                    <span class="order-amount">₹ 507.8</span>
+                                </div>
+                                <div class="order-footer">
+                                    <span class="order-details">S02753 Jan 13, 6:29 AM <span class="clock-icon">⏱</span></span>
+                                    <span class="quotation-badge">Quotation</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="screenshot-caption" style="margin-top: 20px; margin-bottom: 0;">Efficient order management and tracking</p>
+        </div>
+
+            <!-- Order Detail Screenshot -->
+            <div class="screenshot-section" style="margin-top: 30px;">
+                <div class="browser-content">
+                    <img src="./images/invoise (2).png" alt="">
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Features -->
+        <div class="section-title-wrapper">
+            
+            <h2 class="section-title">Additional Features</h2>
+        </div>
+
+        <div class="additional-features-grid">
+            <div class="additional-feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="8" width="18" height="13" rx="2" stroke="#333" stroke-width="1.5" fill="none"/>
+                        <path d="M7 8V6a5 5 0 0110 0v2" stroke="#333" stroke-width="1.5" fill="none"/>
+                        <circle cx="12" cy="15" r="2" stroke="#333" stroke-width="1.5" fill="none"/>
+                    </svg>
+                </div>
+                <h4>Gift Card Management</h4>
+                <ul>
+                    <li>Track Shopify gift cards</li>
+                    <li>Monitor balances and usage</li>
+                </ul>
+            </div>
+
+            <div class="additional-feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <text x="4" y="18" font-size="18" font-weight="bold" fill="none" stroke="#333" stroke-width="1">%</text>
+                    </svg>
+                </div>
+                <h4>Discount Management</h4>
+                <ul>
+                    <li>Sync discount codes</li>
+                    <li>Track price rules from Shopify</li>
+                </ul>
+            </div>
+
+            <div class="additional-feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22 17a2 2 0 01-2 2H4a2 2 0 01-2-2V9.5a2 2 0 012-2h16a2 2 0 012 2V17z" stroke="#333" stroke-width="1.5" fill="none"/>
+                        <path d="M18 7.5V5a2 2 0 00-2-2H8a2 2 0 00-2 2v2.5" stroke="#333" stroke-width="1.5" fill="none"/>
+                    </svg>
+                </div>
+                <h4>Collections Support</h4>
+                <ul>
+                    <li>Sync product collections</li>
+                    <li>Manage smart and manual collections</li>
+                </ul>
+            </div>
+
+            <div class="additional-feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 12h14M12 5l7 7-7 7" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    </svg>
+                </div>
+                <h4>Comprehensive Logging</h4>
+                <ul>
+                    <li>Detailed sync logs</li>
+                    <li>Error tracking and debugging</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Support Section -->
+        <div class="support-section">
+            <div class="support-badge">
+                <svg viewBox="0 0 24 24" fill="#875A7B">
+                    <path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z"/>
+                </svg>
+                Easycomm Shopify Connector
+            </div>
+
+            <h2 class="support-title">For support, questions,<br>or feature requests</h2>
+
+            <div class="contact-buttons">
+                <a href="tel:+919203181213" class="contact-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2">
+                        <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+                    </svg>
+                    +91 9203181213
+                </a>
+                <a href="mailto:hello@easycomminnovations.com" class="contact-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2">
+                        <rect x="2" y="4" width="20" height="16" rx="2"/>
+                        <path d="M22 6L12 13L2 6"/>
+                    </svg>
+                    hello@easycomminnovations.com
+                </a>
+                <a href="https://easysubscription.io/" class="contact-btn" target="_blank">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+                    </svg>
+                    https://easysubscription.io/
+                </a>
+            </div>
+        </div>
+
+        <!-- Version Information -->
+        <div class="version-section">
+            <div class="version-badge-large">
+                <span class="odoo-text">Odoo</span>
+                <span class="version-num">19.0</span>
+            </div>
+            <div class="version-info">
+                <h3>Version Information</h3>
+                <div class="version-info-list">
+                    <div class="version-info-item">
+                        <svg class="icon" viewBox="0 0 24 24" fill="#4A90D9">
+                            <rect x="4" y="2" width="16" height="20" rx="2" fill="#4A90D9"/>
+                            <rect x="7" y="6" width="10" height="2" fill="white"/>
+                            <rect x="7" y="10" width="10" height="2" fill="white"/>
+                            <rect x="7" y="14" width="6" height="2" fill="white"/>
+                        </svg>
+                        <span class="label">Version:</span>
+                        <span class="value">19.0.1.0.0</span>
+                    </div>
+                    <div class="version-info-item">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M12 2L15 8H21L16 12L18 19L12 15L6 19L8 12L3 8H9L12 2Z" fill="#FFD700"/>
+                            <path d="M9 14L12 22L15 14" fill="#FFB800"/>
+                        </svg>
+                        <span class="label">License:</span>
+                        <span class="value purple">LGPL-3</span>
+                    </div>
+                    <div class="version-info-item">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" fill="#22C55E"/>
+                            <path d="M8 12L11 15L16 9" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="label">Compatible with:</span>
+                        <span class="value">Odoo 19.0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

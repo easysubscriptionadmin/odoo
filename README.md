@@ -1,2 +1,2 @@
 # odoo
-shopify connnector
+Easycomm shopify connnector

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Easycomm Shopify Connector',
+    'name': 'Shopify Odoo Connector Easycomm',
     'version': '19.0.1.0.0',
     'category': 'Sales/Integration',
     'summary': 'Integrate Shopify with Odoo - Sync Products, Orders, and Customers',

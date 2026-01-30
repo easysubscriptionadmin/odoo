@@ -3,7 +3,7 @@
     'name': 'Shopify Odoo Connector Easycomm',
     'version': '19.0.1.0.0',
     'category': 'Sales/Integration',
-    'summary': 'Integrate Shopify with Odoo - Sync Products, Orders, and Customers',
+    'summary': 'Unify your Shopify store with Odoo to automate workflows, reduce manual work, and scale faster.',
     'description': """
 Easycomm Shopify Connector for Odoo
 ====================================
@@ -33,7 +33,7 @@ Key Features:
 * **Stock Transfers** - Quick access to inventory transfers
 
     """,
-    'author': 'Easycomm',
+    'author': 'EasyComm Innovations Pvt. Ltd.',
     'website': 'https://easycomm.io',
     'support': 'support@easycomm.com',
     'license': 'LGPL-3',

@@ -12,15 +12,13 @@
     'depends': [
         'base_setup',
         'sales_team',
-        'mail',
         'calendar',
         'resource',
-        'fetchmail',
         'utm',
         'web_planner',
         'web_tour',
         'contacts'
-    ],
+    ], 
     'data': [
         'security/crm_security.xml',
         'security/ir.model.access.csv',

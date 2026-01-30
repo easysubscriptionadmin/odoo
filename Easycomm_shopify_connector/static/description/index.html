@@ -1,644 +1,307 @@
-<!-- ======================================================================== -->
-<!-- EASYCOMM SHOPIFY CONNECTOR - PREMIUM ODOO MODULE DESCRIPTION PAGE -->
-<!-- ======================================================================== -->
-
-<!-- HERO SECTION WITH BACKGROUND IMAGE -->
-<section class="oe_container" style="background: url('images/bg-header.png') center center no-repeat; background-size: cover; padding: 80px 20px; position: relative;">
-    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(102, 126, 234, 0.92) 0%, rgba(118, 75, 162, 0.92) 100%);"></div>
-    <div class="oe_row oe_spaced" style="position: relative; z-index: 2;">
-        <div class="oe_span12 text-center">
-            <div style="margin-bottom: 25px;">
-                <span style="background: rgba(255,255,255,0.2); color: #fff; padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase;">
-                    Odoo 19.0 Compatible
-                </span>
-            </div>
-            <h1 style="color: #ffffff; font-size: 48px; font-weight: 800; margin-bottom: 20px; line-height: 1.2; text-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-                Shopify Odoo Connector
-            </h1>
-            <p style="color: rgba(255,255,255,0.95); font-size: 20px; font-weight: 300; max-width: 650px; margin: 0 auto 35px; line-height: 1.6;">
-                The most powerful bi-directional integration between Shopify and Odoo. Sync everything automatically.
-            </p>
-            <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-top: 30px;">
-                <div style="background: #ffffff; padding: 15px 25px; border-radius: 12px; display: inline-flex; align-items: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-                    <span class="fa fa-refresh" style="color: #667eea; font-size: 24px; margin-right: 12px;"></span>
-                    <div style="text-align: left;">
-                        <div style="color: #2c3e50; font-weight: 700; font-size: 14px;">Bi-directional</div>
-                        <div style="color: #7f8c8d; font-size: 12px;">Product Sync</div>
-                    </div>
-                </div>
-                <div style="background: #ffffff; padding: 15px 25px; border-radius: 12px; display: inline-flex; align-items: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-                    <span class="fa fa-bolt" style="color: #f5576c; font-size: 24px; margin-right: 12px;"></span>
-                    <div style="text-align: left;">
-                        <div style="color: #2c3e50; font-weight: 700; font-size: 14px;">Real-time</div>
-                        <div style="color: #7f8c8d; font-size: 12px;">Webhooks</div>
-                    </div>
-                </div>
-                <div style="background: #ffffff; padding: 15px 25px; border-radius: 12px; display: inline-flex; align-items: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-                    <span class="fa fa-building" style="color: #11998e; font-size: 24px; margin-right: 12px;"></span>
-                    <div style="text-align: left;">
-                        <div style="color: #2c3e50; font-weight: 700; font-size: 14px;">Multi-Store</div>
-                        <div style="color: #7f8c8d; font-size: 12px;">Support</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- MAIN SCREENSHOT FLOATING SECTION -->
-<section class="oe_container" style="margin-top: -60px; position: relative; z-index: 10; padding: 0 20px;">
-    <div class="oe_row">
-        <div class="oe_span12 text-center">
-            <div style="background: #ffffff; border-radius: 20px; box-shadow: 0 30px 80px rgba(0,0,0,0.15); padding: 12px; display: inline-block; max-width: 100%;">
-                <img class="oe_picture oe_screenshot" src="images/main_screenshot.png" style="border-radius: 12px; width: 100%; display: block;">
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- STATISTICS BANNER -->
-<section class="oe_container" style="padding: 60px 20px;">
-    <div class="oe_row">
-        <div class="oe_span3 text-center" style="padding: 20px;">
-            <div style="font-size: 42px; font-weight: 800; color: #667eea; line-height: 1;">20+</div>
-            <div style="color: #7f8c8d; font-size: 14px; margin-top: 8px; font-weight: 500;">Features Included</div>
-        </div>
-        <div class="oe_span3 text-center" style="padding: 20px;">
-            <div style="font-size: 42px; font-weight: 800; color: #11998e; line-height: 1;">100%</div>
-            <div style="color: #7f8c8d; font-size: 14px; margin-top: 8px; font-weight: 500;">Automated Sync</div>
-        </div>
-        <div class="oe_span3 text-center" style="padding: 20px;">
-            <div style="font-size: 42px; font-weight: 800; color: #f5576c; line-height: 1;">24/7</div>
-            <div style="color: #7f8c8d; font-size: 14px; margin-top: 8px; font-weight: 500;">Webhook Support</div>
-        </div>
-        <div class="oe_span3 text-center" style="padding: 20px;">
-            <div style="font-size: 42px; font-weight: 800; color: #764ba2; line-height: 1;">&infin;</div>
-            <div style="color: #7f8c8d; font-size: 14px; margin-top: 8px; font-weight: 500;">Multi-Store</div>
-        </div>
-    </div>
-</section>
-
-<!-- WHY CHOOSE US - FEATURES OVERVIEW -->
-<section class="oe_container oe_dark" style="padding: 70px 20px; background: #f8fafc;">
+<section class="oe_container">
     <div class="oe_row oe_spaced">
-        <div class="oe_span12 text-center">
-            <span style="color: #667eea; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">Why Choose Us</span>
-            <h2 class="oe_slogan" style="color: #1a202c; font-size: 36px; font-weight: 800; margin-top: 10px;">Powerful Features for Your Business</h2>
-            <p style="color: #64748b; font-size: 16px; max-width: 600px; margin: 15px auto 0;">Everything you need to seamlessly connect your Shopify store with Odoo ERP</p>
-        </div>
-    </div>
-    <div class="oe_row" style="margin-top: 50px;">
-        <!-- Feature 1 -->
-        <div class="oe_span4" style="padding: 15px;">
-            <div style="background: #ffffff; border-radius: 16px; padding: 35px 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: all 0.3s; height: 100%;">
-                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
-                    <span class="fa fa-exchange fa-lg" style="color: #ffffff;"></span>
-                </div>
-                <h4 style="color: #1a202c; font-size: 20px; font-weight: 700; margin-bottom: 12px;">Bi-directional Sync</h4>
-                <p style="color: #64748b; font-size: 14px; line-height: 1.7; margin: 0;">
-                    Sync products, customers, and orders in both directions. Changes in Shopify reflect in Odoo and vice versa automatically.
-                </p>
-            </div>
-        </div>
-        <!-- Feature 2 -->
-        <div class="oe_span4" style="padding: 15px;">
-            <div style="background: #ffffff; border-radius: 16px; padding: 35px 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: all 0.3s; height: 100%;">
-                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #11998e, #38ef7d); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
-                    <span class="fa fa-bolt fa-lg" style="color: #ffffff;"></span>
-                </div>
-                <h4 style="color: #1a202c; font-size: 20px; font-weight: 700; margin-bottom: 12px;">Real-time Webhooks</h4>
-                <p style="color: #64748b; font-size: 14px; line-height: 1.7; margin: 0;">
-                    Instant synchronization via Shopify webhooks. Get notified immediately when orders, products, or inventory changes.
-                </p>
-            </div>
-        </div>
-        <!-- Feature 3 -->
-        <div class="oe_span4" style="padding: 15px;">
-            <div style="background: #ffffff; border-radius: 16px; padding: 35px 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: all 0.3s; height: 100%;">
-                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #f093fb, #f5576c); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
-                    <span class="fa fa-line-chart fa-lg" style="color: #ffffff;"></span>
-                </div>
-                <h4 style="color: #1a202c; font-size: 20px; font-weight: 700; margin-bottom: 12px;">Analytics Dashboard</h4>
-                <p style="color: #64748b; font-size: 14px; line-height: 1.7; margin: 0;">
-                    Comprehensive dashboard with sales analytics, top products, sync logs, and performance metrics at a glance.
-                </p>
-            </div>
-        </div>
-    </div>
-    <div class="oe_row" style="margin-top: 10px;">
-        <!-- Feature 4 -->
-        <div class="oe_span4" style="padding: 15px;">
-            <div style="background: #ffffff; border-radius: 16px; padding: 35px 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: all 0.3s; height: 100%;">
-                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #4facfe, #00f2fe); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
-                    <span class="fa fa-cubes fa-lg" style="color: #ffffff;"></span>
-                </div>
-                <h4 style="color: #1a202c; font-size: 20px; font-weight: 700; margin-bottom: 12px;">Inventory Management</h4>
-                <p style="color: #64748b; font-size: 14px; line-height: 1.7; margin: 0;">
-                    Real-time inventory sync with multi-location support. Keep stock levels accurate across all your sales channels.
-                </p>
-            </div>
-        </div>
-        <!-- Feature 5 -->
-        <div class="oe_span4" style="padding: 15px;">
-            <div style="background: #ffffff; border-radius: 16px; padding: 35px 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: all 0.3s; height: 100%;">
-                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #fa709a, #fee140); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
-                    <span class="fa fa-building fa-lg" style="color: #ffffff;"></span>
-                </div>
-                <h4 style="color: #1a202c; font-size: 20px; font-weight: 700; margin-bottom: 12px;">Multi-Store Support</h4>
-                <p style="color: #64748b; font-size: 14px; line-height: 1.7; margin: 0;">
-                    Connect unlimited Shopify stores to one Odoo instance. Manage all stores from a single centralized dashboard.
-                </p>
-            </div>
-        </div>
-        <!-- Feature 6 -->
-        <div class="oe_span4" style="padding: 15px;">
-            <div style="background: #ffffff; border-radius: 16px; padding: 35px 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: all 0.3s; height: 100%;">
-                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #a8edea, #fed6e3); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
-                    <span class="fa fa-clock-o fa-lg" style="color: #5a5a5a;"></span>
-                </div>
-                <h4 style="color: #1a202c; font-size: 20px; font-weight: 700; margin-bottom: 12px;">Automated Scheduler</h4>
-                <p style="color: #64748b; font-size: 14px; line-height: 1.7; margin: 0;">
-                    Set up automated sync schedules. Let the system handle synchronization while you focus on growing your business.
-                </p>
-            </div>
+        <h2 class="oe_slogan" style="color:#875A7B;">Shopify Odoo Connector</h2>
+        <h3 class="oe_slogan">Seamless integration between Shopify and Odoo</h3>
+        <div class="oe_demo oe_picture oe_screenshot">
+            <img src="images/main_screenshot.png">
         </div>
     </div>
 </section>
 
-<!-- PRODUCT SYNC SECTION -->
-<section class="oe_container" style="padding: 80px 20px;">
+<section class="oe_container oe_dark">
     <div class="oe_row oe_spaced">
-        <div class="oe_span6" style="padding-right: 40px;">
-            <span style="color: #667eea; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">Product Management</span>
-            <h2 style="color: #1a202c; font-size: 34px; font-weight: 800; margin-top: 12px; margin-bottom: 20px; line-height: 1.3;">
-                Complete Product Synchronization
-            </h2>
-            <p style="color: #64748b; font-size: 16px; line-height: 1.8; margin-bottom: 30px;">
-                Keep your product catalog perfectly synchronized between Shopify and Odoo. All product data, variants, images, and pricing stay in sync automatically.
+        <h2 class="oe_slogan" style="color:#875A7B;">Bi-directional Product Sync</h2>
+        <h3 class="oe_slogan">Keep your products perfectly synchronized</h3>
+        <div class="oe_span6 text-justify oe_mt32">
+            <span class="fa fa-refresh fa-2x pull-left"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Sync products between Shopify and Odoo with full image support automatically.
             </p>
-            <div style="margin-bottom: 20px; display: flex; align-items: flex-start;">
-                <div style="min-width: 50px; height: 50px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 20px;">
-                    <span class="fa fa-check" style="color: #fff; font-size: 18px;"></span>
-                </div>
-                <div>
-                    <h5 style="color: #1a202c; font-weight: 700; margin-bottom: 5px; font-size: 16px;">Product Variants &amp; Options</h5>
-                    <p style="color: #64748b; margin: 0; font-size: 14px;">Full support for size, color, material and custom variant options</p>
-                </div>
-            </div>
-            <div style="margin-bottom: 20px; display: flex; align-items: flex-start;">
-                <div style="min-width: 50px; height: 50px; background: linear-gradient(135deg, #11998e, #38ef7d); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 20px;">
-                    <span class="fa fa-check" style="color: #fff; font-size: 18px;"></span>
-                </div>
-                <div>
-                    <h5 style="color: #1a202c; font-weight: 700; margin-bottom: 5px; font-size: 16px;">Image Synchronization</h5>
-                    <p style="color: #64748b; margin: 0; font-size: 14px;">Auto-sync all product images including variant-specific images</p>
-                </div>
-            </div>
-            <div style="display: flex; align-items: flex-start;">
-                <div style="min-width: 50px; height: 50px; background: linear-gradient(135deg, #f5576c, #f093fb); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 20px;">
-                    <span class="fa fa-check" style="color: #fff; font-size: 18px;"></span>
-                </div>
-                <div>
-                    <h5 style="color: #1a202c; font-weight: 700; margin-bottom: 5px; font-size: 16px;">Collections &amp; Categories</h5>
-                    <p style="color: #64748b; margin: 0; font-size: 14px;">Sync Shopify collections with Odoo product categories</p>
-                </div>
-            </div>
+            <span class="fa fa-tags fa-2x pull-left"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Full support for product variants, options, and collections.
+            </p>
+            <span class="fa fa-cubes fa-2x pull-left"></span>
+            <p style="margin-left:48px;">
+            Sync inventory quantities from Odoo to Shopify in real-time.
+            </p>
         </div>
         <div class="oe_span6">
-            <div style="position: relative;">
-                <div style="background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 24px; padding: 20px; box-shadow: 0 25px 60px rgba(102, 126, 234, 0.3);">
-                    <img class="oe_picture oe_screenshot" src="images/product_sync.png" style="border-radius: 16px; width: 100%; display: block;">
-                </div>
-                <div style="position: absolute; bottom: -20px; right: -20px; background: #ffffff; border-radius: 16px; padding: 20px 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.1);">
-                    <div style="display: flex; align-items: center;">
-                        <span class="fa fa-refresh fa-spin" style="color: #11998e; font-size: 24px; margin-right: 12px;"></span>
-                        <div>
-                            <div style="color: #1a202c; font-weight: 700; font-size: 14px;">Auto Sync</div>
-                            <div style="color: #11998e; font-size: 12px;">Active</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <img class="oe_picture oe_screenshot" src="images/product_sync.png">
         </div>
     </div>
 </section>
 
-<!-- PRODUCTS SHOWCASE -->
-<section class="oe_container oe_dark" style="padding: 80px 20px; background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);">
+<section class="oe_container">
     <div class="oe_row oe_spaced">
-        <div class="oe_span12 text-center">
-            <span style="color: #667eea; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">Product Catalog</span>
-            <h2 class="oe_slogan" style="color: #ffffff; font-size: 34px; font-weight: 800; margin-top: 12px;">Manage Products Like Never Before</h2>
-            <p style="color: #94a3b8; font-size: 16px; max-width: 600px; margin: 15px auto 40px;">View and manage all your synced products with detailed information and real-time status</p>
-        </div>
-    </div>
-    <div class="oe_row">
-        <div class="oe_span12">
-            <div style="background: rgba(255,255,255,0.05); border-radius: 24px; padding: 15px; border: 1px solid rgba(255,255,255,0.1);">
-                <img class="oe_picture oe_screenshot" src="images/products.png" style="border-radius: 16px; width: 100%; display: block;">
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ORDER MANAGEMENT SECTION -->
-<section class="oe_container" style="padding: 80px 20px;">
-    <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan" style="color:#875A7B;">Order Management</h2>
+        <h3 class="oe_slogan">Import and manage orders effortlessly</h3>
         <div class="oe_span6">
-            <div style="position: relative;">
-                <div style="background: linear-gradient(135deg, #11998e, #38ef7d); border-radius: 24px; padding: 20px; box-shadow: 0 25px 60px rgba(17, 153, 142, 0.3);">
-                    <img class="oe_picture oe_screenshot" src="images/order_management.png" style="border-radius: 16px; width: 100%; display: block;">
-                </div>
-                <div style="position: absolute; top: -20px; left: -20px; background: #ffffff; border-radius: 16px; padding: 20px 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.1);">
-                    <div style="display: flex; align-items: center;">
-                        <span class="fa fa-shopping-cart" style="color: #f5576c; font-size: 24px; margin-right: 12px;"></span>
-                        <div>
-                            <div style="color: #1a202c; font-weight: 700; font-size: 14px;">Orders</div>
-                            <div style="color: #11998e; font-size: 12px;">Importing...</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="oe_span6" style="padding-left: 40px;">
-            <span style="color: #11998e; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">Order Processing</span>
-            <h2 style="color: #1a202c; font-size: 34px; font-weight: 800; margin-top: 12px; margin-bottom: 20px; line-height: 1.3;">
-                Streamlined Order Management
-            </h2>
-            <p style="color: #64748b; font-size: 16px; line-height: 1.8; margin-bottom: 30px;">
-                Import orders automatically with all details. Customer information, line items, shipping, taxes, and payments - everything syncs seamlessly.
-            </p>
-            <div style="background: #f8fafc; border-radius: 16px; padding: 25px; margin-bottom: 20px;">
-                <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                    <span class="fa fa-download" style="color: #667eea; font-size: 20px; margin-right: 15px;"></span>
-                    <span style="color: #1a202c; font-weight: 600;">Automatic Order Import</span>
-                </div>
-                <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                    <span class="fa fa-users" style="color: #11998e; font-size: 20px; margin-right: 15px;"></span>
-                    <span style="color: #1a202c; font-weight: 600;">Customer Auto-Creation</span>
-                </div>
-                <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                    <span class="fa fa-credit-card" style="color: #f5576c; font-size: 20px; margin-right: 15px;"></span>
-                    <span style="color: #1a202c; font-weight: 600;">Payment Transaction Tracking</span>
-                </div>
-                <div style="display: flex; align-items: center;">
-                    <span class="fa fa-gift" style="color: #fa709a; font-size: 20px; margin-right: 15px;"></span>
-                    <span style="color: #1a202c; font-weight: 600;">Gift Cards &amp; Discounts Support</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- SYNC VISUALIZATION -->
-<section class="oe_container oe_dark" style="padding: 80px 20px; background: #f8fafc;">
-    <div class="oe_row oe_spaced">
-        <div class="oe_span6" style="padding-right: 40px;">
-            <span style="color: #f5576c; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">Seamless Integration</span>
-            <h2 style="color: #1a202c; font-size: 34px; font-weight: 800; margin-top: 12px; margin-bottom: 20px; line-height: 1.3;">
-                Two-Way Data Flow
-            </h2>
-            <p style="color: #64748b; font-size: 16px; line-height: 1.8; margin-bottom: 30px;">
-                Experience true bi-directional synchronization. Data flows seamlessly between Shopify and Odoo, keeping both platforms perfectly aligned.
-            </p>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div style="background: #ffffff; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                    <span class="fa fa-cube" style="color: #667eea; font-size: 28px; display: block; margin-bottom: 10px;"></span>
-                    <div style="color: #1a202c; font-weight: 600; font-size: 14px;">Products</div>
-                </div>
-                <div style="background: #ffffff; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                    <span class="fa fa-shopping-bag" style="color: #11998e; font-size: 28px; display: block; margin-bottom: 10px;"></span>
-                    <div style="color: #1a202c; font-weight: 600; font-size: 14px;">Orders</div>
-                </div>
-                <div style="background: #ffffff; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                    <span class="fa fa-users" style="color: #f5576c; font-size: 28px; display: block; margin-bottom: 10px;"></span>
-                    <div style="color: #1a202c; font-weight: 600; font-size: 14px;">Customers</div>
-                </div>
-                <div style="background: #ffffff; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                    <span class="fa fa-archive" style="color: #fa709a; font-size: 28px; display: block; margin-bottom: 10px;"></span>
-                    <div style="color: #1a202c; font-weight: 600; font-size: 14px;">Inventory</div>
-                </div>
-            </div>
+            <img class="oe_picture oe_screenshot" src="images/order_management.png">
         </div>
         <div class="oe_span6">
-            <div style="background: #ffffff; border-radius: 24px; padding: 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.08);">
-                <img class="oe_picture oe_screenshot" src="images/swap.png" style="border-radius: 16px; width: 100%; display: block;">
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- DASHBOARD SECTION -->
-<section class="oe_container" style="padding: 80px 20px;">
-    <div class="oe_row oe_spaced">
-        <div class="oe_span12 text-center">
-            <span style="color: #764ba2; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">Analytics &amp; Insights</span>
-            <h2 class="oe_slogan" style="color: #1a202c; font-size: 36px; font-weight: 800; margin-top: 12px;">Powerful Analytics Dashboard</h2>
-            <p style="color: #64748b; font-size: 16px; max-width: 650px; margin: 15px auto 50px;">
-                Get complete visibility into your Shopify-Odoo integration with real-time analytics, sync status, and performance metrics
+            <p class="oe_mt32 oe_mb32 text-justify">
+            Import orders with customer data and line items automatically. Track payment transactions from Shopify and manage gift cards and discount codes seamlessly.
+            </p>
+            <span class="fa fa-shopping-cart fa-2x pull-left"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Auto-create and update customers from Shopify orders.
+            </p>
+            <span class="fa fa-credit-card fa-2x pull-left"/>
+            <p style="margin-left:48px;">
+            Track all payment transactions and gift cards.
             </p>
         </div>
     </div>
-    <div class="oe_row">
-        <div class="oe_span12">
-            <div style="background: linear-gradient(145deg, #ffffff, #f8fafc); border-radius: 24px; padding: 20px; box-shadow: 0 30px 80px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
-                <img class="oe_picture oe_screenshot" src="images/dashbored.png" style="border-radius: 16px; width: 100%; display: block;">
-            </div>
-        </div>
-    </div>
-    <div class="oe_row" style="margin-top: 50px;">
-        <div class="oe_span3 text-center" style="padding: 15px;">
-            <div style="background: linear-gradient(135deg, #667eea, #764ba2); width: 70px; height: 70px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);">
-                <span class="fa fa-line-chart fa-lg" style="color: #ffffff;"></span>
-            </div>
-            <h5 style="color: #1a202c; font-weight: 700; font-size: 16px; margin-bottom: 8px;">Sales Analytics</h5>
-            <p style="color: #64748b; font-size: 13px; margin: 0;">Track revenue and sales trends</p>
-        </div>
-        <div class="oe_span3 text-center" style="padding: 15px;">
-            <div style="background: linear-gradient(135deg, #11998e, #38ef7d); width: 70px; height: 70px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 10px 30px rgba(17, 153, 142, 0.3);">
-                <span class="fa fa-trophy fa-lg" style="color: #ffffff;"></span>
-            </div>
-            <h5 style="color: #1a202c; font-weight: 700; font-size: 16px; margin-bottom: 8px;">Top Products</h5>
-            <p style="color: #64748b; font-size: 13px; margin: 0;">Identify best sellers</p>
-        </div>
-        <div class="oe_span3 text-center" style="padding: 15px;">
-            <div style="background: linear-gradient(135deg, #f5576c, #f093fb); width: 70px; height: 70px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 10px 30px rgba(245, 87, 108, 0.3);">
-                <span class="fa fa-history fa-lg" style="color: #ffffff;"></span>
-            </div>
-            <h5 style="color: #1a202c; font-weight: 700; font-size: 16px; margin-bottom: 8px;">Sync History</h5>
-            <p style="color: #64748b; font-size: 13px; margin: 0;">Complete audit trail</p>
-        </div>
-        <div class="oe_span3 text-center" style="padding: 15px;">
-            <div style="background: linear-gradient(135deg, #4facfe, #00f2fe); width: 70px; height: 70px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 10px 30px rgba(79, 172, 254, 0.3);">
-                <span class="fa fa-bell fa-lg" style="color: #ffffff;"></span>
-            </div>
-            <h5 style="color: #1a202c; font-weight: 700; font-size: 16px; margin-bottom: 8px;">Smart Alerts</h5>
-            <p style="color: #64748b; font-size: 13px; margin: 0;">Low stock notifications</p>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan" style="color:#875A7B;">Manage Products Like Never Before</h2>
+        <h3 class="oe_slogan">View all your synced products with detailed information</h3>
+        <div class="oe_demo oe_picture oe_screenshot">
+            <img src="images/products.png">
         </div>
     </div>
 </section>
 
-<!-- INVOICE SECTION -->
-<section class="oe_container oe_dark" style="padding: 80px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+<section class="oe_container">
     <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan" style="color:#875A7B;">Two-Way Data Flow</h2>
+        <h3 class="oe_slogan">Experience true bi-directional synchronization</h3>
         <div class="oe_span6">
-            <div style="background: rgba(255,255,255,0.95); border-radius: 24px; padding: 15px; box-shadow: 0 30px 80px rgba(0,0,0,0.2);">
-                <img class="oe_picture oe_screenshot" src="images/invoise.png" style="border-radius: 16px; width: 100%; display: block;">
-            </div>
-        </div>
-        <div class="oe_span6" style="padding-left: 50px;">
-            <span style="color: rgba(255,255,255,0.8); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">Financial Integration</span>
-            <h2 style="color: #ffffff; font-size: 34px; font-weight: 800; margin-top: 12px; margin-bottom: 20px; line-height: 1.3;">
-                Automated Invoice Generation
-            </h2>
-            <p style="color: rgba(255,255,255,0.9); font-size: 16px; line-height: 1.8; margin-bottom: 35px;">
-                Automatically create invoices in Odoo when orders are placed in Shopify. Track payments, refunds, and financial transactions seamlessly.
-            </p>
-            <div style="margin-bottom: 20px;">
-                <span class="fa fa-check-circle" style="color: #38ef7d; font-size: 18px; margin-right: 12px;"></span>
-                <span style="color: #ffffff; font-size: 16px;">Auto-create invoices from orders</span>
-            </div>
-            <div style="margin-bottom: 20px;">
-                <span class="fa fa-check-circle" style="color: #38ef7d; font-size: 18px; margin-right: 12px;"></span>
-                <span style="color: #ffffff; font-size: 16px;">Payment transaction tracking</span>
-            </div>
-            <div style="margin-bottom: 20px;">
-                <span class="fa fa-check-circle" style="color: #38ef7d; font-size: 18px; margin-right: 12px;"></span>
-                <span style="color: #ffffff; font-size: 16px;">Refund management</span>
-            </div>
-            <div>
-                <span class="fa fa-check-circle" style="color: #38ef7d; font-size: 18px; margin-right: 12px;"></span>
-                <span style="color: #ffffff; font-size: 16px;">Tax calculation support</span>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- FEATURES SECTION -->
-<section class="oe_container" style="padding: 80px 20px;">
-    <div class="oe_row oe_spaced">
-        <div class="oe_span6" style="padding-right: 50px;">
-            <span style="color: #f5576c; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">Advanced Features</span>
-            <h2 style="color: #1a202c; font-size: 34px; font-weight: 800; margin-top: 12px; margin-bottom: 20px; line-height: 1.3;">
-                Real-time Webhooks &amp; Automation
-            </h2>
-            <p style="color: #64748b; font-size: 16px; line-height: 1.8; margin-bottom: 35px;">
-                Stay synchronized in real-time with Shopify webhooks. Never miss an update - orders, products, inventory changes sync instantly.
-            </p>
-            <div style="background: #f8fafc; border-radius: 20px; padding: 30px;">
-                <div style="margin-bottom: 25px; padding-bottom: 25px; border-bottom: 1px solid #e2e8f0;">
-                    <div style="display: flex; align-items: center;">
-                        <div style="width: 45px; height: 45px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
-                            <span class="fa fa-shopping-cart" style="color: #fff;"></span>
-                        </div>
-                        <div>
-                            <div style="color: #1a202c; font-weight: 700;">Order Webhooks</div>
-                            <div style="color: #64748b; font-size: 13px;">Create, update, cancel events</div>
-                        </div>
-                    </div>
-                </div>
-                <div style="margin-bottom: 25px; padding-bottom: 25px; border-bottom: 1px solid #e2e8f0;">
-                    <div style="display: flex; align-items: center;">
-                        <div style="width: 45px; height: 45px; background: linear-gradient(135deg, #11998e, #38ef7d); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
-                            <span class="fa fa-cube" style="color: #fff;"></span>
-                        </div>
-                        <div>
-                            <div style="color: #1a202c; font-weight: 700;">Product Webhooks</div>
-                            <div style="color: #64748b; font-size: 13px;">Create, update, delete events</div>
-                        </div>
-                    </div>
-                </div>
-                <div style="margin-bottom: 25px; padding-bottom: 25px; border-bottom: 1px solid #e2e8f0;">
-                    <div style="display: flex; align-items: center;">
-                        <div style="width: 45px; height: 45px; background: linear-gradient(135deg, #f5576c, #f093fb); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
-                            <span class="fa fa-user" style="color: #fff;"></span>
-                        </div>
-                        <div>
-                            <div style="color: #1a202c; font-weight: 700;">Customer Webhooks</div>
-                            <div style="color: #64748b; font-size: 13px;">Create, update events</div>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <div style="display: flex; align-items: center;">
-                        <div style="width: 45px; height: 45px; background: linear-gradient(135deg, #4facfe, #00f2fe); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
-                            <span class="fa fa-archive" style="color: #fff;"></span>
-                        </div>
-                        <div>
-                            <div style="color: #1a202c; font-weight: 700;">Inventory Webhooks</div>
-                            <div style="color: #64748b; font-size: 13px;">Level update events</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <img class="oe_picture oe_screenshot" src="images/swap.png">
         </div>
         <div class="oe_span6">
-            <div style="background: #ffffff; border-radius: 24px; padding: 15px; box-shadow: 0 25px 60px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
-                <img class="oe_picture oe_screenshot" src="images/feature.png" style="border-radius: 16px; width: 100%; display: block;">
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- COMPLETE FEATURE LIST -->
-<section class="oe_container oe_dark" style="padding: 80px 20px; background: #f8fafc;">
-    <div class="oe_row oe_spaced">
-        <div class="oe_span12 text-center">
-            <span style="color: #667eea; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">Everything Included</span>
-            <h2 class="oe_slogan" style="color: #1a202c; font-size: 36px; font-weight: 800; margin-top: 12px;">Complete Feature List</h2>
-            <p style="color: #64748b; font-size: 16px; max-width: 600px; margin: 15px auto 50px;">All the powerful features you need in one comprehensive package</p>
-        </div>
-    </div>
-    <div class="oe_row">
-        <div class="oe_span6" style="padding: 15px;">
-            <div style="background: #ffffff; border-radius: 20px; padding: 35px; box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
-                <h4 style="color: #667eea; font-weight: 700; margin-bottom: 25px; font-size: 18px;">
-                    <span class="fa fa-cube" style="margin-right: 10px;"></span>Product Features
-                </h4>
-                <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Bi-directional Product Sync</span>
-                </div>
-                <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Product Variants &amp; Options</span>
-                </div>
-                <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Image Synchronization</span>
-                </div>
-                <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Product Collections</span>
-                </div>
-                <div style="display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Price &amp; Compare Price Sync</span>
-                </div>
-            </div>
-        </div>
-        <div class="oe_span6" style="padding: 15px;">
-            <div style="background: #ffffff; border-radius: 20px; padding: 35px; box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
-                <h4 style="color: #11998e; font-weight: 700; margin-bottom: 25px; font-size: 18px;">
-                    <span class="fa fa-shopping-cart" style="margin-right: 10px;"></span>Order Features
-                </h4>
-                <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Automatic Order Import</span>
-                </div>
-                <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Customer Synchronization</span>
-                </div>
-                <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Payment Transaction Tracking</span>
-                </div>
-                <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Gift Card Management</span>
-                </div>
-                <div style="display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Discount &amp; Coupon Sync</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="oe_row" style="margin-top: 15px;">
-        <div class="oe_span6" style="padding: 15px;">
-            <div style="background: #ffffff; border-radius: 20px; padding: 35px; box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
-                <h4 style="color: #f5576c; font-weight: 700; margin-bottom: 25px; font-size: 18px;">
-                    <span class="fa fa-archive" style="margin-right: 10px;"></span>Inventory Features
-                </h4>
-                <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Real-time Inventory Sync</span>
-                </div>
-                <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Multi-location Support</span>
-                </div>
-                <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Low Stock Alerts</span>
-                </div>
-                <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Stock Transfer Integration</span>
-                </div>
-                <div style="display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Purchase Order Integration</span>
-                </div>
-            </div>
-        </div>
-        <div class="oe_span6" style="padding: 15px;">
-            <div style="background: #ffffff; border-radius: 20px; padding: 35px; box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
-                <h4 style="color: #764ba2; font-weight: 700; margin-bottom: 25px; font-size: 18px;">
-                    <span class="fa fa-cogs" style="margin-right: 10px;"></span>Advanced Features
-                </h4>
-                <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Real-time Webhooks</span>
-                </div>
-                <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Automated Scheduler</span>
-                </div>
-                <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Multi-Store Support</span>
-                </div>
-                <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Analytics Dashboard</span>
-                </div>
-                <div style="display: flex; align-items: center;">
-                    <span class="fa fa-check-circle" style="color: #11998e; margin-right: 12px;"></span>
-                    <span style="color: #1a202c;">Comprehensive Sync Logs</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- SUPPORT SECTION -->
-<section class="oe_container" style="padding: 80px 20px; background: url('images/footer-bg.png') center center no-repeat; background-size: cover; position: relative;">
-    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(26, 32, 44, 0.95) 0%, rgba(45, 55, 72, 0.95) 100%);"></div>
-    <div class="oe_row oe_spaced" style="position: relative; z-index: 2;">
-        <div class="oe_span12 text-center">
-            <h2 style="color: #ffffff; font-size: 36px; font-weight: 800; margin-bottom: 15px;">Need Help? We're Here For You!</h2>
-            <p style="color: #94a3b8; font-size: 16px; max-width: 550px; margin: 0 auto 40px;">
-                Our dedicated support team is ready to assist you with installation, configuration, and any questions you may have.
+            <p class="oe_mt32 oe_mb32 text-justify">
+            Data flows seamlessly between Shopify and Odoo, keeping both platforms perfectly aligned at all times.
             </p>
-            <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 25px;">
-                <div style="background: rgba(255,255,255,0.08); border-radius: 20px; padding: 35px 45px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
-                    <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                        <span class="fa fa-envelope fa-lg" style="color: #ffffff;"></span>
-                    </div>
-                    <h5 style="color: #ffffff; font-weight: 700; margin-bottom: 8px;">Email Support</h5>
-                    <p style="color: #94a3b8; margin: 0; font-size: 14px;">support@easycomm.com</p>
-                </div>
-                <div style="background: rgba(255,255,255,0.08); border-radius: 20px; padding: 35px 45px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
-                    <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #11998e, #38ef7d); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                        <span class="fa fa-globe fa-lg" style="color: #ffffff;"></span>
-                    </div>
-                    <h5 style="color: #ffffff; font-weight: 700; margin-bottom: 8px;">Website</h5>
-                    <p style="color: #94a3b8; margin: 0; font-size: 14px;">https://easycomm.io</p>
-                </div>
-                <div style="background: rgba(255,255,255,0.08); border-radius: 20px; padding: 35px 45px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
-                    <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #f5576c, #f093fb); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                        <span class="fa fa-book fa-lg" style="color: #ffffff;"></span>
-                    </div>
-                    <h5 style="color: #ffffff; font-weight: 700; margin-bottom: 8px;">Documentation</h5>
-                    <p style="color: #94a3b8; margin: 0; font-size: 14px;">Full setup guide included</p>
-                </div>
-            </div>
+            <span class="fa fa-cube fa-2x pull-left"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Products sync in both directions automatically.
+            </p>
+            <span class="fa fa-users fa-2x pull-left"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Customers sync with addresses and contact details.
+            </p>
+            <span class="fa fa-archive fa-2x pull-left"/>
+            <p style="margin-left:48px;">
+            Inventory levels stay accurate across all channels.
+            </p>
         </div>
     </div>
 </section>
 
-<!-- FOOTER -->
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h2 class="oe_slogan" style="color:#875A7B; text-align: left;">Real-time Webhooks</h2>
+            <h3 class="oe_slogan" style="text-align: left;">Instant synchronization when changes happen</h3>
+            <p class="oe_mt32">
+            Get instant updates via Shopify webhooks.<br/>Never miss an order, product update, or inventory change.
+            </p>
+            <span class="fa fa-bolt fa-2x pull-left"/>
+            <p class="oe_mt32" style="margin-left:48px;">
+            Order created, updated, and cancelled webhooks.
+            </p>
+            <span class="fa fa-cube fa-2x pull-left"/>
+            <p class="oe_mt32" style="margin-left:48px;">
+            Product created, updated, and deleted webhooks.
+            </p>
+            <span class="fa fa-clock-o fa-2x pull-left"/>
+            <p class="oe_mt32" style="margin-left:48px;">
+            Automated scheduler for batch synchronization.
+            </p>
+        </div>
+        <div class="oe_span6">
+            <img class="oe_picture oe_screenshot" src="images/feature.png"/>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan" style="color:#875A7B;">Advanced Analytics Dashboard</h2>
+        <h3 class="oe_slogan">Make data-driven decisions with powerful insights</h3>
+        <div class="oe_demo oe_picture oe_screenshot">
+            <img src="images/dashbored.png">
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan" style="color:#875A7B;">Get more done in less time</h2>
+        <h3 class="oe_slogan">Great Tool = Happy People</h3>
+        <div class="oe_span6">
+            <img class="oe_picture oe_screenshot" src="images/invoise.png">
+        </div>
+        <div class="oe_span6">
+            <p class="oe_mt32 oe_mb32 text-justify">
+            Automate invoice creation from Shopify orders. Track payments, refunds, and all financial transactions seamlessly integrated with Odoo accounting.
+            </p>
+            <span class="fa fa-file-text-o fa-2x pull-left"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Auto-create invoices from Shopify orders.
+            </p>
+            <span class="fa fa-money fa-2x pull-left"/>
+            <p style="margin-left:48px;">
+            Track payment transactions and refunds.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h2 class="oe_slogan" style="color:#875A7B; text-align: left;">Multi-Store Support</h2>
+            <h3 class="oe_slogan" style="text-align: left;">Connect multiple Shopify stores</h3>
+            <p class="oe_mt32">
+            Manage all your Shopify stores from one centralized Odoo instance.<br/>Each store with its own configuration.
+            </p>
+            <span class="fa fa-building fa-2x pull-left"/>
+            <p class="oe_mt32" style="margin-left:48px;">
+            Connect unlimited Shopify stores to single Odoo.
+            </p>
+            <span class="fa fa-map-marker fa-2x pull-left"/>
+            <p class="oe_mt32" style="margin-left:48px;">
+            Location-wise inventory management.
+            </p>
+            <span class="fa fa-exchange fa-2x pull-left"/>
+            <p class="oe_mt32" style="margin-left:48px;">
+            Quick access to stock transfers and purchase orders.
+            </p>
+        </div>
+        <div class="oe_span6">
+            <img class="oe_picture oe_screenshot" src="images/invoise (2).png"/>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan" style="color:#875A7B;">Complete Feature List</h2>
+        <h3 class="oe_slogan">Everything included in this powerful connector</h3>
+        <div class="oe_span6 text-justify oe_mt32">
+            <span class="fa fa-check fa-2x pull-left" style="color:#875A7B;"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Bi-directional Product Sync with Images
+            </p>
+            <span class="fa fa-check fa-2x pull-left" style="color:#875A7B;"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Full Product Variants Support
+            </p>
+            <span class="fa fa-check fa-2x pull-left" style="color:#875A7B;"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Order Import &amp; Management
+            </p>
+            <span class="fa fa-check fa-2x pull-left" style="color:#875A7B;"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Customer Synchronization
+            </p>
+            <span class="fa fa-check fa-2x pull-left" style="color:#875A7B;"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Real-time Webhooks
+            </p>
+            <span class="fa fa-check fa-2x pull-left" style="color:#875A7B;"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Payment Transaction Sync
+            </p>
+            <span class="fa fa-check fa-2x pull-left" style="color:#875A7B;"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Inventory Sync to Shopify
+            </p>
+            <span class="fa fa-check fa-2x pull-left" style="color:#875A7B;"/>
+            <p style="margin-left:48px;">
+            Location-wise Inventory Management
+            </p>
+        </div>
+        <div class="oe_span6 text-justify oe_mt32">
+            <span class="fa fa-check fa-2x pull-left" style="color:#875A7B;"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Product Collections Sync
+            </p>
+            <span class="fa fa-check fa-2x pull-left" style="color:#875A7B;"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Gift Card Management
+            </p>
+            <span class="fa fa-check fa-2x pull-left" style="color:#875A7B;"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Discount &amp; Price Rules Sync
+            </p>
+            <span class="fa fa-check fa-2x pull-left" style="color:#875A7B;"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Automated Scheduler
+            </p>
+            <span class="fa fa-check fa-2x pull-left" style="color:#875A7B;"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Advanced Analytics Dashboard
+            </p>
+            <span class="fa fa-check fa-2x pull-left" style="color:#875A7B;"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Comprehensive Sync Logs
+            </p>
+            <span class="fa fa-check fa-2x pull-left" style="color:#875A7B;"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Multi-Store Support
+            </p>
+            <span class="fa fa-check fa-2x pull-left" style="color:#875A7B;"/>
+            <p style="margin-left:48px;">
+            Low Stock Alerts &amp; Notifications
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan" style="color:#875A7B;">Stay connected with your business</h2>
+        <h3 class="oe_slogan">Real-time messaging to enhance collaboration</h3>
+        <div class="oe_span6">
+            <img class="oe_picture oe_screenshot" src="images/dashbored.png"/>
+        </div>
+        <div class="oe_span6">
+            <p class="oe_mt32 text-justify">
+            Get a quick overview of what's happening in your sync operations. See when products sync, orders import, and inventory updates. Track all synchronization activities with detailed logs.
+            </p>
+            <span class="fa fa-line-chart fa-2x pull-left"/>
+            <p class="oe_mt32 oe_mb32" style="margin-left:48px;">
+            Track sales performance and revenue trends.
+            </p>
+            <span class="fa fa-trophy fa-2x pull-left"/>
+            <p class="oe_mb32" style="margin-left:48px;">
+            Identify your top selling products.
+            </p>
+            <span class="fa fa-bell fa-2x pull-left"/>
+            <p style="margin-left:48px;">
+            Low stock alerts to prevent stockouts.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan" style="color:#875A7B;">Need Help? We're Here For You!</h2>
+        <h3 class="oe_slogan">Our dedicated support team is ready to assist you</h3>
+        <div class="oe_span4 text-center oe_mt32">
+            <span class="fa fa-envelope fa-3x" style="color:#875A7B;"></span>
+            <h4>Email Support</h4>
+            <p>support@easycomm.com</p>
+        </div>
+        <div class="oe_span4 text-center oe_mt32">
+            <span class="fa fa-globe fa-3x" style="color:#875A7B;"></span>
+            <h4>Website</h4>
+            <p>https://easycomm.io</p>
+        </div>
+        <div class="oe_span4 text-center oe_mt32">
+            <span class="fa fa-book fa-3x" style="color:#875A7B;"></span>
+            <h4>Documentation</h4>
+            <p>Full setup guide included</p>
+        </div>
+    </div>
+</section>
+
 <section class="oe_container oe_separator">
 </section>

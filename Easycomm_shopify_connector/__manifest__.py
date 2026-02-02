@@ -71,7 +71,7 @@ Key Features:
     'demo': [],
     'css':['static/description/style.css'],
     'images': [
-        'static/description/images/main_screenshot.png',
+        'static/description/images/Shopify.gif',
         'static/description/images/dashboard.png',
         'static/description/images/product_sync.png',
         'static/description/images/order_management.png',

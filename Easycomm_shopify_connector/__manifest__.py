@@ -36,7 +36,7 @@ Key Features:
     'author': 'EasyComm Innovations Pvt. Ltd.',
     'website': 'https://easycomm.io',
     'support': 'support@easycomm.com',
-    'license': 'LGPL-3',
+    'license': 'OPL-1',
     'depends': [
         'base',
         'sale_management',

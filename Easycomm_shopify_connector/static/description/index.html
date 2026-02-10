@@ -4,56 +4,56 @@
     <title>Easycomm Shopify Connector</title>
     <link rel="stylesheet" href="https://apps.odoo.com/web/assets/1/2675728/web.assets_frontend.min.css">
     <style>
-        /* ---- Spacing fixes for Odoo (padding-based - Odoo resets margins but NOT padding) ---- */
+        /* ---- Spacing via PADDING only (Odoo resets margins AND gap) ---- */
 
-        /* Alternating feature rows: 120px vertical spacing */
         .ec-row-gap-120 > .ec-feature-row { padding-top: 120px !important; }
         .ec-row-gap-120 > .ec-feature-row:first-child { padding-top: 0 !important; }
 
-        /* Sub-cards inside alternating rows: 20px vertical spacing via wrapper div padding */
         .ec-card-gap > div { padding-bottom: 20px !important; }
         .ec-card-gap > div:last-child { padding-bottom: 0 !important; }
 
-        /* Alternating row: 63px horizontal spacing between text and image */
-        .ec-alt-row > *:first-child { margin-right: 63px !important; }
-        .ec-alt-row > *:last-child { margin-right: 0 !important; }
+        /* Column spacing: Text Left | Image Right */
+        .ec-alt-row > .ec-alt-text { padding-right: 32px !important; }
+        .ec-alt-row > .ec-alt-img { padding-left: 32px !important; }
 
-        /* Contact buttons spacing */
-        .ec-contact-btn { margin-right: 17px !important; margin-bottom: 10px !important; }
+        /* Column spacing: Image Left | Text Right (reversed) */
+        .ec-alt-row-reverse > .ec-alt-img { padding-right: 32px !important; padding-left: 0 !important; }
+        .ec-alt-row-reverse > .ec-alt-text { padding-left: 32px !important; padding-right: 0 !important; }
 
-        /* Feature grid cards: padding-bottom on the col wrapper (Odoo can't override this) */
+        .ec-contact-btn-wrap { padding-right: 17px !important; padding-bottom: 10px !important; }
         .ec-feature-card { padding-bottom: 32px !important; }
-
-        /* ---- CTA section flex layout ---- */
         .ec-cta-left { flex: 1; min-width: 0; }
+        .ec-badge-text { padding-right: 25px !important; }
+        .ec-cta-right { padding-left: 15px !important; }
+        .ec-cta-wrap { padding-bottom: 60px !important; }
 
-        /* ---- Responsive ---- */
         @media (max-width: 1199px) {
-            .ec-cta-section { padding: 0 40px !important; }
+            .ec-cta-inner { padding: 0 40px !important; }
             .ec-cta-heading { font-size: 56px !important; }
             .ec-cta-right { width: 280px !important; height: 280px !important; }
         }
         @media (max-width: 991px) {
             .ec-hero-gif { height: 400px !important; }
             .ec-alt-row { flex-direction: column !important; }
-            .ec-alt-row .ec-alt-text,
-            .ec-alt-row .ec-alt-img { width: 100% !important; }
-            .ec-alt-row > *:first-child { margin-right: 0 !important; }
-            .ec-alt-row .ec-alt-img { margin-top: 30px !important; }
+            .ec-alt-row > .ec-alt-text,
+            .ec-alt-row > .ec-alt-img { width: 100% !important; padding-right: 0 !important; padding-left: 0 !important; }
+            .ec-alt-row-reverse > .ec-alt-text,
+            .ec-alt-row-reverse > .ec-alt-img { padding-right: 0 !important; padding-left: 0 !important; }
+            .ec-alt-row > .ec-alt-img { padding-top: 30px !important; }
             .ec-row-gap-120 > .ec-feature-row { padding-top: 60px !important; }
-            .ec-cta-section { height: auto !important; padding: 50px 40px !important; border-radius: 30px !important; flex-direction: column !important; margin-left: 15px !important; margin-right: 15px !important; }
+            .ec-cta-inner { height: auto !important; padding: 50px 40px !important; border-radius: 30px !important; flex-direction: column !important; }
             .ec-cta-left { width: 100% !important; }
-            .ec-cta-right { width: 100% !important; height: 250px !important; margin-top: 30px !important; margin-left: 0 !important; }
+            .ec-cta-right { width: 100% !important; height: 250px !important; padding-top: 30px !important; padding-left: 0 !important; }
             .ec-cta-heading { font-size: 42px !important; }
             .ec-contact-text { font-size: 16px !important; }
             .ec-contact-btn { height: 44px !important; padding: 5px 16px !important; }
             .ec-version-section { padding: 60px 20px 40px 20px !important; }
             .ec-version-items { flex-direction: column !important; }
-            .ec-version-item { margin-bottom: 16px !important; }
+            .ec-version-item { padding-bottom: 16px !important; }
         }
         @media (max-width: 767px) {
             .ec-hero-gif { height: 280px !important; border-bottom-left-radius: 25px !important; border-bottom-right-radius: 25px !important; }
-            .ec-cta-section { padding: 40px 20px !important; border-radius: 20px !important; }
+            .ec-cta-inner { padding: 40px 20px !important; border-radius: 20px !important; }
             .ec-cta-heading { font-size: 28px !important; }
             .ec-contact-text { font-size: 14px !important; }
             .ec-contact-btn { height: 40px !important; padding: 5px 12px !important; border-radius: 20px !important; }
@@ -75,42 +75,22 @@
 
         <!-- ======== HERO SECTION ======== -->
         <section class="overflow-hidden mx-auto" style="max-width: 1357px; border-bottom-left-radius: 50px; border-bottom-right-radius: 50px;">
-            <img src="./images/logoodoo.gif" alt="Hero"
-                class="w-100 d-block ec-hero-gif"
-                style="height: 730px; object-fit: cover;">
+            <img src="./images/logoodoo.gif" alt="Hero" class="w-100 d-block ec-hero-gif" style="height: 730px; object-fit: cover;">
         </section>
-
 
         <!-- ======== ALTERNATING FEATURES SECTION ======== -->
         <section class="d-flex flex-column align-items-center w-100 mx-auto ec-row-gap-120" style="padding: 60px 15px; max-width: 1204px;">
 
             <!-- ROW 1: Text Left | Image Right -->
             <div class="d-flex align-items-center justify-content-center w-100 ec-feature-row ec-alt-row">
-                <!-- Text -->
                 <div class="d-flex flex-column align-items-start ec-alt-text" style="width: 526px;">
                     <h3 class="fw-semibold mb-3" style="font-size: 35px; color: #071738;">Bi-directional Product Sync</h3>
                     <div class="d-flex flex-column w-100 ec-card-gap">
-                        <div>
-                            <div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);">
-                                <img src="./images/package.png" alt="" width="32" height="32" class="me-3">
-                                <span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Two-way product synchronization between Odoo and Shopify.</span>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);">
-                                <img src="./images/package.png" alt="" width="32" height="32" class="me-3">
-                                <span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Real-time updates for inventory, pricing, and images.</span>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);">
-                                <img src="./images/package.png" alt="" width="32" height="32" class="me-3">
-                                <span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Eliminate manual updates and data mismatch.</span>
-                            </div>
-                        </div>
+                        <div><div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);"><img src="./images/package.png" alt="" width="32" height="32" class="me-3"><span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Two-way product synchronization between Odoo and Shopify.</span></div></div>
+                        <div><div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);"><img src="./images/package.png" alt="" width="32" height="32" class="me-3"><span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Real-time updates for inventory, pricing, and images.</span></div></div>
+                        <div><div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);"><img src="./images/package.png" alt="" width="32" height="32" class="me-3"><span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Eliminate manual updates and data mismatch.</span></div></div>
                     </div>
                 </div>
-                <!-- Image -->
                 <div class="d-flex flex-column align-items-start ec-alt-img" style="width: 569px;">
                     <div class="w-100" style="height: 45px; background-color: #F4F1F6; border-top-left-radius: 19px; border-top-right-radius: 19px;"></div>
                     <img src="./images/product_sync.png" alt="Product Sync" class="w-100" style="height: 306px; object-fit: cover; border-bottom-left-radius: 19px; border-bottom-right-radius: 19px;">
@@ -118,65 +98,31 @@
             </div>
 
             <!-- ROW 2: Image Left | Text Right -->
-            <div class="d-flex align-items-center justify-content-center w-100 ec-feature-row ec-alt-row">
-                <!-- Image -->
+            <div class="d-flex align-items-center justify-content-center w-100 ec-feature-row ec-alt-row ec-alt-row-reverse">
                 <div class="d-flex flex-column align-items-start ec-alt-img" style="width: 573px;">
                     <div class="w-100" style="height: 45px; background-color: #F4F1F6; border-top-left-radius: 19px; border-top-right-radius: 19px;"></div>
                     <img src="./images/order_management.png" alt="Order Management" class="w-100" style="height: 308px; object-fit: cover; border-bottom-left-radius: 19px; border-bottom-right-radius: 19px;">
                 </div>
-                <!-- Text -->
                 <div class="d-flex flex-column align-items-start ec-alt-text" style="width: 526px;">
                     <h3 class="fw-semibold mb-3" style="font-size: 35px; color: #071738;">Order Management</h3>
                     <div class="d-flex flex-column w-100 ec-card-gap">
-                        <div>
-                            <div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);">
-                                <img src="./images/Frame_2092815667.png" alt="" width="32" height="32" class="me-3">
-                                <span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Centralized order management between Shopify and Odoo.</span>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);">
-                                <img src="./images/Frame_2092815667.png" alt="" width="32" height="32" class="me-3">
-                                <span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Real-time sync for orders, customers, and payments.</span>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);">
-                                <img src="./images/Frame_2092815667.png" alt="" width="32" height="32" class="me-3">
-                                <span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Streamline processing and reduce manual work.</span>
-                            </div>
-                        </div>
+                        <div><div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);"><img src="./images/Frame_2092815667.png" alt="" width="32" height="32" class="me-3"><span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Centralized order management between Shopify and Odoo.</span></div></div>
+                        <div><div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);"><img src="./images/Frame_2092815667.png" alt="" width="32" height="32" class="me-3"><span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Real-time sync for orders, customers, and payments.</span></div></div>
+                        <div><div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);"><img src="./images/Frame_2092815667.png" alt="" width="32" height="32" class="me-3"><span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Streamline processing and reduce manual work.</span></div></div>
                     </div>
                 </div>
             </div>
 
             <!-- ROW 3: Text Left | Image Right -->
             <div class="d-flex align-items-center justify-content-center w-100 ec-feature-row ec-alt-row">
-                <!-- Text -->
                 <div class="d-flex flex-column align-items-start ec-alt-text" style="width: 526px;">
                     <h3 class="fw-semibold mb-3" style="font-size: 35px; color: #071738;">Two-Way Data Flow</h3>
                     <div class="d-flex flex-column w-100 ec-card-gap">
-                        <div>
-                            <div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);">
-                                <img src="./images/frame1.png" alt="" width="32" height="32" class="me-3">
-                                <span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Enable seamless two-way data exchange.</span>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);">
-                                <img src="./images/frame1.png" alt="" width="32" height="32" class="me-3">
-                                <span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Keep products, orders, and inventory aligned.</span>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);">
-                                <img src="./images/frame1.png" alt="" width="32" height="32" class="me-3">
-                                <span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Ensure consistency across platforms.</span>
-                            </div>
-                        </div>
+                        <div><div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);"><img src="./images/frame1.png" alt="" width="32" height="32" class="me-3"><span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Enable seamless two-way data exchange.</span></div></div>
+                        <div><div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);"><img src="./images/frame1.png" alt="" width="32" height="32" class="me-3"><span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Keep products, orders, and inventory aligned.</span></div></div>
+                        <div><div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);"><img src="./images/frame1.png" alt="" width="32" height="32" class="me-3"><span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Ensure consistency across platforms.</span></div></div>
                     </div>
                 </div>
-                <!-- Image -->
                 <div class="d-flex flex-column align-items-start ec-alt-img" style="width: 557px;">
                     <div class="w-100" style="height: 44px; background-color: #F4F1F6; border-top-left-radius: 19px; border-top-right-radius: 19px;"></div>
                     <img src="./images/new.png" alt="Two-Way Data Flow" class="w-100" style="height: 300px; object-fit: cover; border-bottom-left-radius: 19px; border-bottom-right-radius: 19px;">
@@ -184,65 +130,31 @@
             </div>
 
             <!-- ROW 4: Image Left | Text Right -->
-            <div class="d-flex align-items-center justify-content-center w-100 ec-feature-row ec-alt-row">
-                <!-- Image -->
+            <div class="d-flex align-items-center justify-content-center w-100 ec-feature-row ec-alt-row ec-alt-row-reverse">
                 <div class="d-flex flex-column align-items-start ec-alt-img" style="width: 569px;">
                     <div class="w-100" style="height: 45px; background-color: #F4F1F6; border-top-left-radius: 19px; border-top-right-radius: 19px;"></div>
                     <img src="./images/invoise.png" alt="Multi-Store Support" class="w-100" style="height: 306px; object-fit: cover; border-bottom-left-radius: 19px; border-bottom-right-radius: 19px;">
                 </div>
-                <!-- Text -->
                 <div class="d-flex flex-column align-items-start ec-alt-text" style="width: 526px;">
                     <h3 class="fw-semibold mb-3" style="font-size: 35px; color: #071738;">Multi-Store Support</h3>
                     <div class="d-flex flex-column w-100 ec-card-gap">
-                        <div>
-                            <div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);">
-                                <img src="./images/call.png" alt="" width="35" height="32" class="me-3">
-                                <span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Support for multiple Shopify stores in a single Odoo system.</span>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);">
-                                <img src="./images/call.png" alt="" width="35" height="32" class="me-3">
-                                <span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Sync products, inventory, and orders across stores.</span>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);">
-                                <img src="./images/call.png" alt="" width="35" height="32" class="me-3">
-                                <span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Maintain full control from one dashboard.</span>
-                            </div>
-                        </div>
+                        <div><div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);"><img src="./images/call.png" alt="" width="35" height="32" class="me-3"><span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Support for multiple Shopify stores in a single Odoo system.</span></div></div>
+                        <div><div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);"><img src="./images/call.png" alt="" width="35" height="32" class="me-3"><span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Sync products, inventory, and orders across stores.</span></div></div>
+                        <div><div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);"><img src="./images/call.png" alt="" width="35" height="32" class="me-3"><span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Maintain full control from one dashboard.</span></div></div>
                     </div>
                 </div>
             </div>
 
             <!-- ROW 5: Text Left | Image Right -->
             <div class="d-flex align-items-center justify-content-center w-100 ec-feature-row ec-alt-row">
-                <!-- Text -->
                 <div class="d-flex flex-column align-items-start ec-alt-text" style="width: 526px;">
                     <h3 class="fw-semibold mb-3" style="font-size: 35px; color: #071738;">Shopify Analytics Dashboard</h3>
                     <div class="d-flex flex-column w-100 ec-card-gap">
-                        <div>
-                            <div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);">
-                                <img src="./images/chart.png" alt="" width="39" height="32" class="me-3">
-                                <span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Centralized analytics for your Shopify store in Odoo.</span>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);">
-                                <img src="./images/chart.png" alt="" width="39" height="32" class="me-3">
-                                <span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Monitor sales, orders, and key metrics in real time.</span>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);">
-                                <img src="./images/chart.png" alt="" width="39" height="32" class="me-3">
-                                <span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Get complete visibility into business performance.</span>
-                            </div>
-                        </div>
+                        <div><div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);"><img src="./images/chart.png" alt="" width="39" height="32" class="me-3"><span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Centralized analytics for your Shopify store in Odoo.</span></div></div>
+                        <div><div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);"><img src="./images/chart.png" alt="" width="39" height="32" class="me-3"><span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Monitor sales, orders, and key metrics in real time.</span></div></div>
+                        <div><div class="bg-white d-flex align-items-center border px-3" style="min-width: 292px; height: 80px; border-radius: 20px; border-color: #B6BCCD !important; box-shadow: 0px 10px 18px rgba(58,76,146,0.10), 0px 2px 6px rgba(44,58,114,0.05);"><img src="./images/chart.png" alt="" width="39" height="32" class="me-3"><span style="flex: 1; font-size: 16px; font-weight: 500; line-height: 22.72px; color: #1C1F25;">Get complete visibility into business performance.</span></div></div>
                     </div>
                 </div>
-                <!-- Image -->
                 <div class="d-flex flex-column align-items-start ec-alt-img" style="width: 631px;">
                     <div class="w-100" style="height: 50px; background-color: #F4F1F6; border-top-left-radius: 21px; border-top-right-radius: 21px;"></div>
                     <img src="./images/dashbored.png" alt="Analytics Dashboard" class="w-100" style="height: 340px; object-fit: cover; border-bottom-left-radius: 21px; border-bottom-right-radius: 21px;">
@@ -251,38 +163,24 @@
 
         </section>
 
-
         <!-- ======== VERSION INFORMATION SECTION ======== -->
-        <section class="d-flex flex-column align-items-center justify-content-center w-100 ec-version-section"
-            style="background-color: #F6F3F8; padding: 112px 152px 82px 152px;">
-            <div class="bg-white d-inline-flex align-items-center rounded-pill mb-4 ec-badge-pill"
-                style="padding: 32px 65px 37px 46px; box-shadow: 2.3px 2.3px 39px rgba(10,9,15,0.40);">
-                <span class="ec-badge-text" style="font-size: 58px; font-weight: 500; line-height: 46px; margin-right: 25px;">
+        <section class="d-flex flex-column align-items-center justify-content-center w-100 ec-version-section" style="background-color: #F6F3F8; padding: 112px 152px 82px 152px;">
+            <div class="bg-white d-inline-flex align-items-center rounded-pill mb-4 ec-badge-pill" style="padding: 32px 65px 37px 46px; box-shadow: 2.3px 2.3px 39px rgba(10,9,15,0.40);">
+                <span class="ec-badge-text" style="font-size: 58px; font-weight: 500; line-height: 46px;">
                     <span style="color: #714B67;">O</span><span style="color: #8F8F8F;">doo</span>
                 </span>
-                <div class="text-white rounded-pill d-flex align-items-center justify-content-center ec-badge-version"
-                    style="background-color: #714B67; padding: 37px 46px; box-shadow: 2.3px 2.3px 39px rgba(10,9,15,0.10); font-size: 37px; font-weight: 500; line-height: 46px;">19.0</div>
+                <div class="text-white rounded-pill d-flex align-items-center justify-content-center ec-badge-version" style="background-color: #714B67; padding: 37px 46px; box-shadow: 2.3px 2.3px 39px rgba(10,9,15,0.10); font-size: 37px; font-weight: 500; line-height: 46px;">19.0</div>
             </div>
             <div class="d-flex flex-column align-items-center w-100 mt-3">
                 <h3 class="fw-bold text-center mb-3" style="font-size: 36px; color: #071738;">Version Information</h3>
                 <hr class="w-100 m-0" style="opacity: 0.10; border-top: 1.6px solid #090909;">
             </div>
             <div class="d-flex align-items-center justify-content-center w-100 mt-4 flex-wrap ec-version-items">
-                <div class="d-flex align-items-center overflow-hidden ec-version-item" style="padding: 8px 22px; border-radius: 48px;">
-                    <img src="./images/icon1.png" alt="" width="51" height="51" class="me-2">
-                    <span style="font-size: 19px;"><span class="fw-bold" style="color: black;">Version:</span><span class="fw-bold" style="color: #071738;"> 19.0.1.0.0</span></span>
-                </div>
-                <div class="d-flex align-items-center overflow-hidden ec-version-item" style="padding: 8px 22px; border-radius: 48px;">
-                    <img src="./images/icon2.png" alt="" width="51" height="51" class="me-2">
-                    <span style="font-size: 19px;"><span class="fw-bold" style="color: black;">License:</span><span class="fw-bold" style="color: #88C255;"> LGPL-3</span></span>
-                </div>
-                <div class="d-flex align-items-center overflow-hidden ec-version-item" style="padding: 8px 22px; border-radius: 48px;">
-                    <img src="./images/icon3.png" alt="" width="50" height="51" class="me-2">
-                    <span style="font-size: 19px;"><span class="fw-bold" style="color: black;">Compatible with:</span><span class="fw-bold" style="color: #071738;"> Odoo 19.0</span></span>
-                </div>
+                <div class="d-flex align-items-center overflow-hidden ec-version-item" style="padding: 8px 22px; border-radius: 48px;"><img src="./images/icon1.png" alt="" width="51" height="51" class="me-2"><span style="font-size: 19px;"><span class="fw-bold" style="color: black;">Version:</span><span class="fw-bold" style="color: #071738;"> 19.0.1.0.0</span></span></div>
+                <div class="d-flex align-items-center overflow-hidden ec-version-item" style="padding: 8px 22px; border-radius: 48px;"><img src="./images/icon2.png" alt="" width="51" height="51" class="me-2"><span style="font-size: 19px;"><span class="fw-bold" style="color: black;">License:</span><span class="fw-bold" style="color: #88C255;"> LGPL-3</span></span></div>
+                <div class="d-flex align-items-center overflow-hidden ec-version-item" style="padding: 8px 22px; border-radius: 48px;"><img src="./images/icon3.png" alt="" width="50" height="51" class="me-2"><span style="font-size: 19px;"><span class="fw-bold" style="color: black;">Compatible with:</span><span class="fw-bold" style="color: #071738;"> Odoo 19.0</span></span></div>
             </div>
         </section>
-
 
         <!-- ======== FEATURES GRID SECTION ======== -->
         <section class="d-flex flex-column align-items-center overflow-hidden w-100" style="padding: 50px 32px;">
@@ -290,73 +188,44 @@
                 <h2 class="fw-bold mb-0 ec-features-title" style="font-size: 65px; color: #071738;">Features</h2>
             </div>
             <div class="row justify-content-center mx-auto" style="max-width: 1204px; padding-top: 40px; padding-bottom: 80px;">
-
-                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/package.png" alt="" width="32" height="32" style="margin-bottom: 16px;"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Product Collections Sync</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Auto-sync collections<br>• Sync discounts &amp; items<br>• Collection status tracking</p></div></div></div>
-
-                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper.png" alt="" width="32" height="32" style="margin-bottom: 16px;"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Full Product Variants Support</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Variant-level syncing<br>• Attribute mapping<br>• Option consistency</p></div></div></div>
-
-                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-1.png" alt="" width="32" height="32" style="margin-bottom: 16px;"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Gift Card Management</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Balance synchronization<br>• Multi-store usage<br>• Expiry tracking</p></div></div></div>
-
-                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-2.png" alt="" width="32" height="32" style="margin-bottom: 16px;"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Discount &amp; Price Rules Sync</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Rule-based pricing<br>• Coupon sync<br>• Dynamic discounts</p></div></div></div>
-
-                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-6.png" alt="" width="32" height="32" style="margin-bottom: 16px;"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Discount &amp; Price Rules Sync</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Rule-based pricing<br>• Coupon sync<br>• Dynamic discounts</p></div></div></div>
-
-                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-3.png" alt="" width="32" height="32" style="margin-bottom: 16px;"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Customer Synchronization</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Customer data sync<br>• Address mapping<br>• Contact updates</p></div></div></div>
-
-                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-4.png" alt="" width="32" height="32" style="margin-bottom: 16px;"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Automated Scheduler</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Scheduled sync jobs<br>• Frequency control<br>• Background execution</p></div></div></div>
-
-                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-5.png" alt="" width="32" height="32" style="margin-bottom: 16px;"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Real-time Webhooks</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Instant data push<br>• Event-based triggers<br>• Live updates</p></div></div></div>
-
-                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-6.png" alt="" width="32" height="32" style="margin-bottom: 16px;"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Advanced Analytics Dashboard</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Sales insights<br>• Performance metrics<br>• Trend visualization</p></div></div></div>
-
-                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-7.png" alt="" width="32" height="32" style="margin-bottom: 16px;"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Payment Transaction Sync</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Payment mapping<br>• Transaction tracking<br>• Reconciliation support</p></div></div></div>
-
-                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-8.png" alt="" width="29" height="29" style="margin-bottom: 16px;"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Comprehensive Sync Logs</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Detailed activity logs<br>• Error tracking<br>• Sync history</p></div></div></div>
-
-                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-9.png" alt="" width="29" height="29" style="margin-bottom: 16px;"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Inventory Sync to Shopify</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Stock level updates<br>• Quantity mapping<br>• Availability control</p></div></div></div>
-
-                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-10.png" alt="" width="32" height="32" style="margin-bottom: 16px;"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Multi-Store Support</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Multiple store linking<br>• Centralized control<br>• Store-wise sync</p></div></div></div>
-
-                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-11.png" alt="" width="32" height="32" style="margin-bottom: 16px;"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Location-wise Inventory Management</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Warehouse mapping<br>• Location stock control<br>• Multi-location sync</p></div></div></div>
-
-                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-12.png" alt="" width="32" height="32" style="margin-bottom: 16px;"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Low Stock Alerts</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Threshold alerts<br>• Email notifications<br>• Stock risk prevention</p></div></div></div>
-
+                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/package.png" alt="" width="32" height="32" class="mb-3"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Product Collections Sync</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Auto-sync collections<br>• Sync discounts &amp; items<br>• Collection status tracking</p></div></div></div>
+                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper.png" alt="" width="32" height="32" class="mb-3"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Full Product Variants Support</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Variant-level syncing<br>• Attribute mapping<br>• Option consistency</p></div></div></div>
+                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-1.png" alt="" width="32" height="32" class="mb-3"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Gift Card Management</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Balance synchronization<br>• Multi-store usage<br>• Expiry tracking</p></div></div></div>
+                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-2.png" alt="" width="32" height="32" class="mb-3"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Discount &amp; Price Rules Sync</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Rule-based pricing<br>• Coupon sync<br>• Dynamic discounts</p></div></div></div>
+                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-6.png" alt="" width="32" height="32" class="mb-3"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Discount &amp; Price Rules Sync</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Rule-based pricing<br>• Coupon sync<br>• Dynamic discounts</p></div></div></div>
+                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-3.png" alt="" width="32" height="32" class="mb-3"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Customer Synchronization</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Customer data sync<br>• Address mapping<br>• Contact updates</p></div></div></div>
+                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-4.png" alt="" width="32" height="32" class="mb-3"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Automated Scheduler</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Scheduled sync jobs<br>• Frequency control<br>• Background execution</p></div></div></div>
+                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-5.png" alt="" width="32" height="32" class="mb-3"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Real-time Webhooks</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Instant data push<br>• Event-based triggers<br>• Live updates</p></div></div></div>
+                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-6.png" alt="" width="32" height="32" class="mb-3"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Advanced Analytics Dashboard</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Sales insights<br>• Performance metrics<br>• Trend visualization</p></div></div></div>
+                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-7.png" alt="" width="32" height="32" class="mb-3"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Payment Transaction Sync</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Payment mapping<br>• Transaction tracking<br>• Reconciliation support</p></div></div></div>
+                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-8.png" alt="" width="29" height="29" class="mb-3"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Comprehensive Sync Logs</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Detailed activity logs<br>• Error tracking<br>• Sync history</p></div></div></div>
+                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-9.png" alt="" width="29" height="29" class="mb-3"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Inventory Sync to Shopify</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Stock level updates<br>• Quantity mapping<br>• Availability control</p></div></div></div>
+                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-10.png" alt="" width="32" height="32" class="mb-3"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Multi-Store Support</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Multiple store linking<br>• Centralized control<br>• Store-wise sync</p></div></div></div>
+                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-11.png" alt="" width="32" height="32" class="mb-3"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Location-wise Inventory Management</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Warehouse mapping<br>• Location stock control<br>• Multi-location sync</p></div></div></div>
+                <div class="col-md-4 col-sm-6 ec-feature-card"><div class="bg-white shadow d-flex flex-column justify-content-center align-items-start h-100" style="border-radius: 20px; padding: 32px; border: 1px solid #B6BCCD;"><img src="./images/Icon wrapper-12.png" alt="" width="32" height="32" class="mb-3"><div class="d-flex flex-column" style="min-height: 133px;"><h5 class="fw-bold mb-1" style="font-size: 20px; line-height: 28px; color: #1C1F25;">Low Stock Alerts</h5><p class="mb-0" style="font-size: 14px; line-height: 22px; color: #334155;">• Threshold alerts<br>• Email notifications<br>• Stock risk prevention</p></div></div></div>
             </div>
         </section>
-
 
         <!-- ======== NEED HELP / CTA SECTION ======== -->
-        <section class="d-flex align-items-center overflow-hidden mx-auto ec-cta-section"
-            style="max-width: 1357px; height: 508px; background-color: #071738; border-radius: 50px; padding: 0 76px; margin-bottom: 60px;">
-            <div class="d-flex flex-column align-items-start ec-cta-left">
-                <div class="bg-white d-flex align-items-center shadow rounded-pill mb-3"
-                    style="padding: 8px 12px; outline: 1px #B6BCCD solid; outline-offset: -1px;">
-                    <img src="./images/AI.png" alt="" width="20" height="20" class="me-2">
-                    <span style="font-size: 16px; font-weight: 500; line-height: 25.6px; color: #4B5162;">Shopify Odoo Connector</span>
+        <div class="ec-cta-wrap">
+            <section class="d-flex align-items-center overflow-hidden mx-auto ec-cta-inner" style="max-width: 1357px; height: 508px; background-color: #071738; border-radius: 50px; padding: 0 76px;">
+                <div class="d-flex flex-column align-items-start ec-cta-left">
+                    <div class="bg-white d-flex align-items-center shadow rounded-pill mb-3" style="padding: 8px 12px; outline: 1px #B6BCCD solid; outline-offset: -1px;">
+                        <img src="./images/AI.png" alt="" width="20" height="20" class="me-2">
+                        <span style="font-size: 16px; font-weight: 500; line-height: 25.6px; color: #4B5162;">Shopify Odoo Connector</span>
+                    </div>
+                    <h1 class="text-white fw-semibold mb-4 ec-cta-heading" style="font-size: 80px; line-height: 1.05;">Need Help?<br>We're Here For You!</h1>
+                    <div class="d-flex align-items-center flex-wrap">
+                        <div class="ec-contact-btn-wrap d-inline-flex"><a href="tel:+919203181213" class="bg-white d-flex align-items-center overflow-hidden text-decoration-none ec-contact-btn" style="height: 50px; padding: 5px 21px; border-radius: 30px;"><img src="./images/phone.png" alt="" width="20" height="20" class="me-1"><span class="fw-bold ec-contact-text" style="font-size: 20px; color: #071738;">+91 9203181213</span></a></div>
+                        <div class="ec-contact-btn-wrap d-inline-flex"><a href="mailto:odoo@easycomm.io" class="bg-white d-flex align-items-center overflow-hidden text-decoration-none ec-contact-btn" style="height: 50px; padding: 5px 21px; border-radius: 30px;"><img src="./images/mail.png" alt="" width="20" height="20" class="me-1"><span class="fw-bold ec-contact-text" style="font-size: 20px; color: #071738;">odoo@easycomm.io</span></a></div>
+                        <div class="ec-contact-btn-wrap d-inline-flex"><a href="https://easycomm.io" target="_blank" class="bg-white d-flex align-items-center overflow-hidden text-decoration-none ec-contact-btn" style="height: 50px; padding: 5px 21px; border-radius: 30px;"><img src="./images/globe.png" alt="" width="20" height="20" class="me-1"><span class="fw-bold ec-contact-text" style="font-size: 20px; color: #071738;">https://easycomm.io</span></a></div>
+                    </div>
                 </div>
-                <h1 class="text-white fw-semibold mb-4 ec-cta-heading" style="font-size: 80px; line-height: 1.05;">Need Help?<br>We're Here For You!</h1>
-                <div class="d-flex align-items-center flex-wrap">
-                    <a href="tel:+919203181213" class="bg-white d-flex align-items-center overflow-hidden text-decoration-none ec-contact-btn"
-                       style="height: 50px; padding: 5px 21px; border-radius: 30px;">
-                        <img src="./images/phone.png" alt="" width="20" height="20" class="me-1">
-                        <span class="fw-bold ec-contact-text" style="font-size: 20px; color: #071738;">+91 9203181213</span>
-                    </a>
-                    <a href="mailto:odoo@easycomm.io" class="bg-white d-flex align-items-center overflow-hidden text-decoration-none ec-contact-btn"
-                       style="height: 50px; padding: 5px 21px; border-radius: 30px;">
-                        <img src="./images/mail.png" alt="" width="20" height="20" class="me-1">
-                        <span class="fw-bold ec-contact-text" style="font-size: 20px; color: #071738;">odoo@easycomm.io</span>
-                    </a>
-                    <a href="https://easycomm.io" target="_blank" class="bg-white d-flex align-items-center overflow-hidden text-decoration-none ec-contact-btn"
-                       style="height: 50px; padding: 5px 21px; border-radius: 30px;">
-                        <img src="./images/globe.png" alt="" width="20" height="20" class="me-1">
-                        <span class="fw-bold ec-contact-text" style="font-size: 20px; color: #071738;">https://easycomm.io</span>
-                    </a>
+                <div class="d-flex align-items-center justify-content-center ec-cta-right" style="width: 367px; height: 367px; flex-shrink: 0;">
+                    <img src="./images/star.png" alt="Mailbox" style="width: 100%; height: 100%; object-fit: contain;">
                 </div>
-            </div>
-            <div class="d-flex align-items-center justify-content-center ec-cta-right" style="width: 367px; height: 367px; flex-shrink: 0; margin-left: 15px;">
-                <img src="./images/star.png" alt="Mailbox" style="width: 100%; height: 100%; object-fit: contain;">
-            </div>
-        </section>
+            </section>
+        </div>
 
     </div>
 </body>

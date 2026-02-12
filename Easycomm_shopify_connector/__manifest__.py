@@ -76,6 +76,7 @@ Key Features:
         'static/description/images/product_sync.png',
         'static/description/images/order_management.png',
     ],
+    'live_test_url': 'https://calendly.com/derek-easycomm/30min',
     'installable': True,
     'application': True,
     'auto_install': False,

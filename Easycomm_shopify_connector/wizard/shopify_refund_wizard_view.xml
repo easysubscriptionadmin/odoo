@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_shopify_refund_wizard_form" model="ir.ui.view">
+        <field name="name">shopify.refund.wizard.form</field>
+        <field name="model">shopify.refund.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create Refund in Shopify">
+                <sheet>
+                    <group>
+                        <group string="Order Info">
+                            <field name="order_id" readonly="1"/>
+                            <field name="shopify_order_id" readonly="1"/>
+                            <field name="order_amount" readonly="1" string="Order Total"/>
+                        </group>
+                        <group string="Refund Details">
+                            <field name="refund_amount"/>
+                            <field name="notify_customer"/>
+                            <field name="restock"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="refund_note" placeholder="Reason for refund..."/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_create_refund"
+                            type="object"
+                            string="Create Refund in Shopify"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

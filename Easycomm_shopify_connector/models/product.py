@@ -144,12 +144,13 @@ class ProductTemplate(models.Model):
                     ('shopify_instance_id', '=', instance.id)
                 ], limit=1)
 
+                ctx = {'shopify_sync_skip': True}
                 if existing_product:
-                    existing_product.write(product_vals)
+                    existing_product.with_context(**ctx).write(product_vals)
                     updated_count += 1
                     _logger.debug(f'Updated product: {product_data.get("title")}')
                 else:
-                    self.create(product_vals)
+                    self.with_context(**ctx).create(product_vals)
                     created_count += 1
                     _logger.debug(f'Created product: {product_data.get("title")}')
             except Exception as e:
@@ -238,6 +239,168 @@ class ProductTemplate(models.Model):
                         vals['image_1920'] = image_data
 
         return vals
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Odoo → Shopify auto-sync on product create / edit
+    # ─────────────────────────────────────────────────────────────────────────
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        products = super().create(vals_list)
+        if self.env.context.get('shopify_sync_skip'):
+            return products
+        for product in products:
+            # Only push when a Shopify instance is assigned and not already
+            # linked (prevents duplicate on import)
+            if product.shopify_instance_id and not product.shopify_product_id:
+                try:
+                    product.with_context(shopify_sync_skip=True)._create_product_in_shopify()
+                except Exception as e:
+                    _logger.warning(f'Auto-create product in Shopify failed for {product.name}: {str(e)}')
+        return products
+
+    def write(self, vals):
+        result = super().write(vals)
+        if self.env.context.get('shopify_sync_skip'):
+            return result
+        sync_trigger_fields = {
+            'name', 'description', 'list_price', 'default_code',
+            'shopify_product_status', 'shopify_vendor', 'shopify_tags', 'shopify_product_type',
+        }
+        if any(f in vals for f in sync_trigger_fields):
+            for product in self:
+                if product.is_shopify_product and product.shopify_product_id and product.shopify_instance_id:
+                    try:
+                        product.with_context(shopify_sync_skip=True)._push_product_update_to_shopify()
+                    except Exception as e:
+                        _logger.warning(f'Auto-sync product to Shopify failed for {product.name}: {str(e)}')
+        return result
+
+    def _build_shopify_product_payload(self):
+        """Build the REST API product dict (create or update)."""
+        self.ensure_one()
+        has_variants = len(self.product_variant_ids) > 1
+
+        payload = {
+            'product': {
+                'title': self.name,
+                'body_html': self.description or '',
+                'vendor': self.shopify_vendor or 'Odoo',
+                'product_type': self.shopify_product_type or '',
+                'tags': self.shopify_tags or '',
+                'status': self.shopify_product_status or 'active',
+            }
+        }
+
+        if has_variants:
+            payload['product']['options'] = [
+                {
+                    'name': attr_line.attribute_id.name,
+                    'values': [v.name for v in attr_line.value_ids],
+                }
+                for attr_line in self.attribute_line_ids
+            ]
+            variants = []
+            for variant in self.product_variant_ids:
+                v = {
+                    'price': str(variant.lst_price),
+                    'sku': variant.default_code or '',
+                    'inventory_management': 'shopify',
+                    'option1': variant.product_template_attribute_value_ids[0].name
+                    if variant.product_template_attribute_value_ids else 'Default',
+                }
+                if len(variant.product_template_attribute_value_ids) > 1:
+                    v['option2'] = variant.product_template_attribute_value_ids[1].name
+                if len(variant.product_template_attribute_value_ids) > 2:
+                    v['option3'] = variant.product_template_attribute_value_ids[2].name
+                if variant.shopify_variant_id:
+                    v['id'] = int(variant.shopify_variant_id)
+                variants.append(v)
+            payload['product']['variants'] = variants
+        else:
+            variant = self.product_variant_ids[:1]
+            v = {
+                'price': str(self.list_price),
+                'sku': self.default_code or '',
+                'inventory_management': 'shopify',
+                'option1': 'Default Title',
+            }
+            if variant and variant.shopify_variant_id:
+                v['id'] = int(variant.shopify_variant_id)
+            payload['product']['options'] = [{'name': 'Title', 'values': ['Default Title']}]
+            payload['product']['variants'] = [v]
+
+        return payload
+
+    def _create_product_in_shopify(self):
+        """Create this product in Shopify and store the returned IDs on the record."""
+        self.ensure_one()
+        instance = self.shopify_instance_id
+        if not instance:
+            return
+
+        payload = self._build_shopify_product_payload()
+        url = f"{instance._get_base_url()}/products.json"
+        response = requests.post(
+            url,
+            headers=instance._get_headers(),
+            json=payload,
+            timeout=30,
+            verify=certifi.where(),
+        )
+
+        if response.status_code == 201:
+            result = response.json().get('product', {})
+            self.with_context(shopify_sync_skip=True).write({
+                'shopify_product_id': str(result['id']),
+                'is_shopify_product': True,
+                'shopify_created_at': self._parse_shopify_datetime(result.get('created_at')),
+                'shopify_updated_at': self._parse_shopify_datetime(result.get('updated_at')),
+            })
+            # Store variant IDs back on each product variant
+            shopify_variants = result.get('variants', [])
+            odoo_variants = list(self.product_variant_ids)
+            for sv, ov in zip(shopify_variants, odoo_variants):
+                ov.with_context(shopify_sync_skip=True).write({
+                    'shopify_variant_id': str(sv['id']),
+                    'shopify_inventory_item_id': str(sv.get('inventory_item_id', '')),
+                })
+            _logger.info(f'Product "{self.name}" created in Shopify with ID {result["id"]}')
+        else:
+            _logger.warning(
+                f'Failed to create product "{self.name}" in Shopify: '
+                f'{response.status_code} - {response.text}'
+            )
+
+    def _push_product_update_to_shopify(self):
+        """Push field changes to Shopify for an already-linked product."""
+        self.ensure_one()
+        instance = self.shopify_instance_id
+        if not instance or not self.shopify_product_id:
+            return
+
+        payload = self._build_shopify_product_payload()
+        url = f"{instance._get_base_url()}/products/{self.shopify_product_id}.json"
+        response = requests.put(
+            url,
+            headers=instance._get_headers(),
+            json=payload,
+            timeout=30,
+            verify=certifi.where(),
+        )
+
+        if response.status_code == 200:
+            result = response.json().get('product', {})
+            updated_at = self._parse_shopify_datetime(result.get('updated_at'))
+            self.with_context(shopify_sync_skip=True).write(
+                {'shopify_updated_at': updated_at or fields.Datetime.now()}
+            )
+            _logger.info(f'Product "{self.name}" updated in Shopify successfully')
+        else:
+            _logger.warning(
+                f'Failed to update product "{self.name}" in Shopify: '
+                f'{response.status_code} - {response.text}'
+            )
 
     def export_product_to_shopify(self):
         """Export a single product to Shopify"""

@@ -3,6 +3,7 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 import logging
+import threading
 import requests
 import certifi
 
@@ -26,9 +27,15 @@ class ShopifyOperation(models.TransientModel):
         ('export_customers', 'Export Customers to Shopify'),
     ], string='Operation', required=True, default='import_products')
 
-    # For order import filter
-    import_orders_from_date = fields.Datetime('Import Orders From Date',
-                                               help='Import orders created after this date. Leave empty to import all orders.')
+    # For order import date range filter
+    import_orders_from_date = fields.Datetime(
+        'Orders From',
+        help='Import orders created on or after this date. Leave empty for no lower limit.',
+    )
+    import_orders_to_date = fields.Datetime(
+        'Orders To',
+        help='Import orders created on or before this date. Leave empty for no upper limit.',
+    )
 
     # For export operations
     product_ids = fields.Many2many('product.template', string='Products to Export',
@@ -95,18 +102,80 @@ class ShopifyOperation(models.TransientModel):
             raise UserError(_('Customer import failed: %s') % str(e))
 
     def _import_orders(self):
-        """Import orders from Shopify"""
-        _logger.info(f'Starting order import from Shopify instance: {self.shopify_instance_id.name}')
+        """Import orders from Shopify in a background thread.
 
-        try:
-            result = self.env['sale.order'].import_shopify_orders(
-                self.shopify_instance_id.id,
-                date_from=self.import_orders_from_date
+        Returns immediately with an 'Import started' toast.
+        Progress toasts (every 20 orders) and a final completion toast are
+        sent via the Odoo bus so the user sees live updates without the UI
+        being blocked.
+        """
+        instance_id = self.shopify_instance_id.id
+        instance_name = self.shopify_instance_id.name
+        date_from = self.import_orders_from_date
+        date_to = self.import_orders_to_date
+        uid = self.env.uid
+        registry = self.env.registry
+
+        _logger.info(
+            f'Scheduling background order import for instance {instance_name} '
+            f'(date_from={date_from}, date_to={date_to})'
+        )
+
+        def run_import():
+            import odoo
+            with registry.cursor() as cr:
+                env = odoo.api.Environment(cr, uid, {})
+                try:
+                    env['sale.order'].import_shopify_orders(
+                        instance_id,
+                        date_from=date_from,
+                        date_to=date_to,
+                        batch_size=20,
+                        notify_uid=uid,
+                    )
+                    cr.commit()
+                except Exception as exc:
+                    _logger.error(f'Background order import failed: {exc}')
+                    # Send failure notification via bus
+                    try:
+                        partner = env['res.users'].browse(uid).partner_id
+                        env['bus.bus']._sendone(partner, 'simple_notification', {
+                            'title': _('Order Import Failed'),
+                            'message': str(exc),
+                            'type': 'danger',
+                        })
+                        cr.commit()
+                    except Exception:
+                        pass
+
+        thread = threading.Thread(target=run_import, daemon=True)
+        thread.start()
+
+        # Build a helpful summary of what date range is being imported
+        if date_from and date_to:
+            date_info = _('from %s to %s') % (
+                date_from.strftime('%d %b %Y'), date_to.strftime('%d %b %Y')
             )
-            return result
-        except Exception as e:
-            _logger.error(f'Error in order import: {str(e)}')
-            raise UserError(_('Order import failed: %s') % str(e))
+        elif date_from:
+            date_info = _('from %s onwards') % date_from.strftime('%d %b %Y')
+        elif date_to:
+            date_info = _('up to %s') % date_to.strftime('%d %b %Y')
+        else:
+            date_info = _('all orders')
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Order Import Started'),
+                'message': _(
+                    'Importing %s from Shopify in the background (batches of 20). '
+                    'You will receive a notification after each batch.'
+                ) % date_info,
+                'type': 'info',
+                'sticky': False,
+            }
+        }
 
     def _export_products(self):
         """Export products to Shopify"""

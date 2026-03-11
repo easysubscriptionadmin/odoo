@@ -57,12 +57,43 @@ class ShopifyInstance(models.Model):
         shop_url = self.shop_url.replace('.myshopify.com', '').strip()
         return f"https://{shop_url}.myshopify.com/admin/api/{self.api_version}"
 
+    def _get_graphql_url(self):
+        self.ensure_one()
+        shop_url = self.shop_url.replace('.myshopify.com', '').strip()
+        return f"https://{shop_url}.myshopify.com/admin/api/{self.api_version}/graphql.json"
+
     def _get_headers(self):
         self.ensure_one()
         return {
             'Content-Type': 'application/json',
             'X-Shopify-Access-Token': self.access_token,
         }
+
+    def _execute_graphql(self, query, variables=None):
+        """Execute a GraphQL mutation or query against Shopify Admin API"""
+        self.ensure_one()
+        url = self._get_graphql_url()
+        payload = {'query': query}
+        if variables:
+            payload['variables'] = variables
+
+        response = requests.post(
+            url,
+            headers=self._get_headers(),
+            json=payload,
+            timeout=30,
+            verify=certifi.where()
+        )
+
+        if response.status_code != 200:
+            raise UserError(_('GraphQL request failed: %s - %s') % (response.status_code, response.text))
+
+        result = response.json()
+        if result.get('errors'):
+            error_msgs = [e.get('message', str(e)) for e in result['errors']]
+            raise UserError(_('Shopify GraphQL errors: %s') % ', '.join(error_msgs))
+
+        return result.get('data', {})
 
     def test_connection(self):
         self.ensure_one()

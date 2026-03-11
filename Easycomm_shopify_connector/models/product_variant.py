@@ -33,6 +33,22 @@ class ProductProduct(models.Model):
     shopify_fulfillment_service = fields.Char('Fulfillment Service', default='manual')
     shopify_inventory_management = fields.Char('Inventory Management', default='shopify')
 
+    def write(self, vals):
+        result = super().write(vals)
+        if self.env.context.get('shopify_sync_skip'):
+            return result
+        sync_trigger_fields = {'lst_price', 'default_code', 'barcode', 'weight', 'shopify_inventory_policy'}
+        if any(f in vals for f in sync_trigger_fields):
+            for variant in self:
+                if variant.shopify_variant_id and variant.product_tmpl_id.shopify_instance_id:
+                    try:
+                        variant.with_context(shopify_sync_skip=True).sync_variant_to_shopify()
+                    except Exception as e:
+                        _logger.warning(
+                            f'Auto-sync variant to Shopify failed for {variant.display_name}: {str(e)}'
+                        )
+        return result
+
     def sync_variant_to_shopify(self):
         """Sync variant inventory and price to Shopify"""
         self.ensure_one()

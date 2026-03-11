@@ -5,6 +5,7 @@ from . import product
 from . import product_variant
 from . import partner
 from . import order
+from . import stock_picking
 from . import inventory_sync
 from . import analytics
 from . import scheduler

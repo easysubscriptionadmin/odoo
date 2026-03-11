@@ -12,8 +12,9 @@
                         <field name="shopify_operation"/>
                     </group>
                     <group string="Additional Options" invisible="shopify_operation not in ['import_orders', 'export_products', 'export_customers']">
-                        <group invisible="shopify_operation != 'import_orders'">
-                            <field name="import_orders_from_date"/>
+                        <group invisible="shopify_operation != 'import_orders'" string="Date Range (optional)">
+                            <field name="import_orders_from_date" string="From Date"/>
+                            <field name="import_orders_to_date" string="To Date"/>
                         </group>
                         <group invisible="shopify_operation != 'export_products'">
                             <field name="product_ids" widget="many2many_tags"/>

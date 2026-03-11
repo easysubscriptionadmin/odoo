@@ -25,3 +25,5 @@ access_shopify_inventory_location_line_user,shopify.inventory.location.line.user
 access_shopify_inventory_location_line_manager,shopify.inventory.location.line.manager,model_shopify_inventory_location_line,sales_team.group_sale_manager,1,1,1,1
 access_shopify_discount_user,shopify.discount.user,model_shopify_discount,sales_team.group_sale_salesman,1,0,0,0
 access_shopify_discount_manager,shopify.discount.manager,model_shopify_discount,sales_team.group_sale_manager,1,1,1,1
+access_shopify_refund_wizard_user,shopify.refund.wizard.user,model_shopify_refund_wizard,sales_team.group_sale_salesman,1,1,1,1
+access_shopify_refund_wizard_manager,shopify.refund.wizard.manager,model_shopify_refund_wizard,sales_team.group_sale_manager,1,1,1,1

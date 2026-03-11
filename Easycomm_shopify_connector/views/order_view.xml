@@ -36,12 +36,41 @@
                     </group>
                     <separator string="Payment Transactions" invisible="not shopify_transaction_ids"/>
                     <field name="shopify_transaction_ids" nolabel="1" invisible="not shopify_transaction_ids"/>
-                    <div class="oe_chatter">
+                    <group string="Sync to Shopify" invisible="is_shopify_order == False">
+                        <group>
+                            <field name="shopify_fulfillment_id" readonly="1" string="Fulfillment ID"/>
+                            <field name="shopify_refund_id" readonly="1" string="Refund ID"/>
+                        </group>
+                    </group>
+                    <div>
                         <button name="export_order_to_shopify"
                                 type="object"
                                 string="Export to Shopify (Draft Order)"
-                                class="oe_highlight"
+                                class="btn-primary"
                                 invisible="shopify_instance_id == False or state != 'draft'"/>
+                        <button name="push_order_update_to_shopify"
+                                type="object"
+                                string="Sync All to Shopify"
+                                class="btn-secondary"
+                                confirm="This will sync order note and all line item qty/price changes to Shopify. Continue?"
+                                invisible="is_shopify_order == False or shopify_order_id == False"/>
+                        <button name="create_fulfillment_in_shopify"
+                                type="object"
+                                string="Fulfill in Shopify"
+                                class="btn-success"
+                                confirm="This will create a fulfillment in Shopify and notify the customer. Continue?"
+                                invisible="is_shopify_order == False or shopify_order_id == False or shopify_fulfillment_status == 'fulfilled'"/>
+                        <button name="cancel_order_in_shopify"
+                                type="object"
+                                string="Cancel in Shopify"
+                                class="btn-warning"
+                                confirm="This will cancel the order in Shopify and restock items. Continue?"
+                                invisible="is_shopify_order == False or shopify_order_id == False or shopify_cancelled_at != False"/>
+                        <button name="action_open_refund_wizard"
+                                type="object"
+                                string="Refund in Shopify"
+                                class="btn-danger"
+                                invisible="is_shopify_order == False or shopify_order_id == False"/>
                     </div>
                 </page>
             </xpath>

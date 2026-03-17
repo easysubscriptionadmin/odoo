@@ -4,7 +4,7 @@
     <menuitem id="shopify_menu_root"
               name="Shopify Odoo Connector"
               sequence="20"
-              web_icon="Easycomm_shopify_connector_v17,static/description/icon.png"/>
+              web_icon="Easycomm_shopify_connector,static/description/icon.png"/>
 
     <!-- Sales Menu -->
     <menuitem id="shopify_sales_menu"

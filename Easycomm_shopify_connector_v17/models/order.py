@@ -935,23 +935,84 @@ class SaleOrder(models.Model):
                 )
                 restock_type = 'no_restock'
 
+        # ── Build refund_line_items ────────────────────────────────────────────
+        # Only needed when the user wants to restock items.
+        # For a pure monetary refund (restock=False) Shopify only needs the
+        # transactions entry — sending refund_line_items with the full ordered
+        # quantity would fail on partially-refunded or already-refunded orders
+        # with: "cannot refund more items than were purchased".
         refund_line_items = []
-        for line in self.order_line:
-            if not line.shopify_line_id:
-                continue
-            item = {
-                'line_item_id': int(line.shopify_line_id),
-                'quantity': int(line.product_uom_qty),
-                'restock_type': restock_type,
-            }
-            if restock_type == 'return' and location_id:
-                item['location_id'] = location_id
-            refund_line_items.append(item)
+        if restock:
+            # Fetch already-refunded quantities so we cap at what remains
+            already_refunded = {}  # {line_item_id: qty already refunded}
+            try:
+                refunds_url = (
+                    f"{instance._get_base_url()}"
+                    f"/orders/{self.shopify_order_id}/refunds.json"
+                )
+                r = requests.get(
+                    refunds_url, headers=instance._get_headers(),
+                    timeout=30, verify=certifi.where(),
+                )
+                if r.status_code == 200:
+                    for prev in r.json().get('refunds', []):
+                        for rli in prev.get('refund_line_items', []):
+                            lid = rli.get('line_item_id')
+                            already_refunded[lid] = (
+                                already_refunded.get(lid, 0) + rli.get('quantity', 0)
+                            )
+                    _logger.info(
+                        f'[create_refund_in_shopify] Already-refunded qtys: '
+                        f'{already_refunded}'
+                    )
+                else:
+                    _logger.warning(
+                        f'[create_refund_in_shopify] Could not fetch existing refunds '
+                        f'({r.status_code}) — will use full ordered qty (may fail)'
+                    )
+            except Exception as e:
+                _logger.warning(
+                    f'[create_refund_in_shopify] Error fetching existing refunds: {e} '
+                    f'— will use full ordered qty'
+                )
 
-        if not refund_line_items:
+            for line in self.order_line:
+                if not line.shopify_line_id:
+                    continue
+                line_id = int(line.shopify_line_id)
+                ordered_qty = int(line.product_uom_qty)
+                already = already_refunded.get(line_id, 0)
+                remaining = ordered_qty - already
+                if remaining <= 0:
+                    _logger.info(
+                        f'[create_refund_in_shopify] Line {line_id} fully refunded '
+                        f'already (ordered={ordered_qty}, refunded={already}) — skipping'
+                    )
+                    continue
+                item = {
+                    'line_item_id': line_id,
+                    'quantity': remaining,
+                    'restock_type': restock_type,
+                }
+                if restock_type == 'return' and location_id:
+                    item['location_id'] = location_id
+                refund_line_items.append(item)
+                _logger.info(
+                    f'[create_refund_in_shopify] Line {line_id}: '
+                    f'refunding qty={remaining} (ordered={ordered_qty}, '
+                    f'already_refunded={already})'
+                )
+
+        if not refund_line_items and restock:
             _logger.warning(
-                f'[create_refund_in_shopify] Could not resolve any Shopify line IDs for '
-                f'order {self.name} — will rely on transaction entry only.'
+                f'[create_refund_in_shopify] restock=True but no refundable lines found '
+                f'for order {self.name} — all lines may already be fully refunded. '
+                f'Proceeding with monetary refund only.'
+            )
+        elif not restock:
+            _logger.info(
+                f'[create_refund_in_shopify] restock=False — skipping refund_line_items, '
+                f'using transactions entry only for monetary refund'
             )
 
         refund_payload = {

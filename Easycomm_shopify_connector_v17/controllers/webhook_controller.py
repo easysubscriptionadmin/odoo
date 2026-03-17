@@ -7,7 +7,11 @@ import json
 import logging
 
 from odoo import http
-from odoo.http import request, Response
+from odoo.http import request
+try:
+    from odoo.http import Response
+except ImportError:
+    from werkzeug.wrappers import Response
 
 _logger = logging.getLogger(__name__)
 

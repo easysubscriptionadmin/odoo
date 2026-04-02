@@ -5,7 +5,7 @@
         <field name="name">shopify.gift.card.list</field>
         <field name="model">shopify.gift.card</field>
         <field name="arch" type="xml">
-            <list string="Shopify Gift Cards" decoration-success="status=='enabled'" decoration-muted="status=='disabled'" decoration-danger="status=='expired'">
+            <tree string="Shopify Gift Cards" decoration-success="status=='enabled'" decoration-muted="status=='disabled'" decoration-danger="status=='expired'">
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="initial_value" widget="monetary"/>
@@ -14,7 +14,7 @@
                 <field name="status" widget="badge" decoration-success="status=='enabled'" decoration-muted="status=='disabled'" decoration-danger="status=='expired'"/>
                 <field name="expires_on"/>
                 <field name="shopify_instance_id"/>
-            </list>
+            </tree>
         </field>
     </record>
 

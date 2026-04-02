@@ -43,7 +43,7 @@
         <field name="name">shopify.instance.list</field>
         <field name="model">shopify.instance</field>
         <field name="arch" type="xml">
-            <list string="Shopify Instances">
+            <tree string="Shopify Instances">
                 <field name="name"/>
                 <field name="shop_url"/>
                 <field name="currency_id" optional="show"/>
@@ -52,7 +52,7 @@
                 <field name="last_customer_sync"/>
                 <field name="last_order_sync"/>
                 <field name="active"/>
-            </list>
+            </tree>
         </field>
     </record>
 

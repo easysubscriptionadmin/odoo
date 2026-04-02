@@ -5,14 +5,14 @@
         <field name="name">shopify.collection.list</field>
         <field name="model">shopify.collection</field>
         <field name="arch" type="xml">
-            <list string="Shopify Collections">
+            <tree string="Shopify Collections">
                 <field name="name"/>
                 <field name="shopify_instance_id"/>
                 <field name="collection_type"/>
                 <field name="product_count"/>
                 <field name="published" widget="boolean_toggle"/>
                 <field name="shopify_collection_id"/>
-            </list>
+            </tree>
         </field>
     </record>
 
@@ -60,14 +60,14 @@
                                 <strong>No products yet!</strong> Click "Fetch Products" button to load products from Shopify.
                             </div>
                             <field name="product_ids" nolabel="1">
-                                <list>
+                                <tree>
                                     <field name="image_128" widget="image" class="oe_avatar"/>
                                     <field name="name"/>
                                     <field name="default_code" string="SKU"/>
                                     <field name="shopify_product_type" optional="show"/>
                                     <field name="list_price" widget="monetary"/>
                                     <field name="qty_available" string="Stock" optional="show"/>
-                                </list>
+                                </tree>
                             </field>
                         </page>
                         <page string="Details" name="details">

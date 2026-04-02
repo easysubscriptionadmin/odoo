@@ -5,7 +5,7 @@
         <field name="name">shopify.inventory.location.list</field>
         <field name="model">shopify.inventory.location</field>
         <field name="arch" type="xml">
-            <list string="Shopify Inventory Locations">
+            <tree string="Shopify Inventory Locations">
                 <field name="location_name"/>
                 <field name="location_type"/>
                 <field name="city"/>
@@ -14,7 +14,7 @@
                 <field name="total_quantity" string="Total Qty" sum="Total"/>
                 <field name="active_location" widget="boolean_toggle"/>
                 <field name="shopify_instance_id"/>
-            </list>
+            </tree>
         </field>
     </record>
 
@@ -67,14 +67,14 @@
                                 <strong>Tip:</strong> If some items show as "Unknown", sync your products first, then click "Sync &amp; Link Products" to link inventory items to products.
                             </div>
                             <field name="inventory_line_ids" nolabel="1">
-                                <list editable="bottom" decoration-danger="available &lt;= 0" decoration-warning="available &lt; 10">
+                                <tree editable="bottom" decoration-danger="available &lt;= 0" decoration-warning="available &lt; 10">
                                     <field name="product_name" string="Product"/>
                                     <field name="product_sku" string="SKU"/>
                                     <field name="product_id" optional="hide"/>
                                     <field name="product_variant_id" optional="hide"/>
                                     <field name="available" string="Available Qty" sum="Total"/>
                                     <field name="inventory_item_id" optional="hide"/>
-                                </list>
+                                </tree>
                             </field>
                         </page>
                     </notebook>

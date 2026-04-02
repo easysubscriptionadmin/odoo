@@ -5,7 +5,7 @@
         <field name="name">shopify.payment.transaction.list</field>
         <field name="model">shopify.payment.transaction</field>
         <field name="arch" type="xml">
-            <list string="Payment Transactions" decoration-success="status=='paid'" decoration-info="status=='authorized'" decoration-muted="status=='failed'">
+            <tree string="Payment Transactions" decoration-success="status=='paid'" decoration-info="status=='authorized'" decoration-muted="status=='failed'">
                 <field name="name"/>
                 <field name="transaction_date"/>
                 <field name="partner_id"/>
@@ -17,7 +17,7 @@
                 <field name="kind"/>
                 <field name="status" widget="badge" decoration-success="status=='paid'" decoration-info="status=='authorized'" decoration-danger="status=='failed'"/>
                 <field name="test_transaction" widget="boolean_toggle"/>
-            </list>
+            </tree>
         </field>
     </record>
 

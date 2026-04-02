@@ -73,7 +73,7 @@
         <field name="name">shopify.scheduler.list</field>
         <field name="model">shopify.scheduler</field>
         <field name="arch" type="xml">
-            <list string="Sync Schedules">
+            <tree string="Sync Schedules">
                 <field name="name"/>
                 <field name="shopify_instance_id"/>
                 <field name="interval_number"/>
@@ -84,7 +84,7 @@
                        decoration-warning="last_run_status == 'partial'"
                        decoration-danger="last_run_status == 'failed'"/>
                 <field name="active" widget="boolean_toggle"/>
-            </list>
+            </tree>
         </field>
     </record>
 

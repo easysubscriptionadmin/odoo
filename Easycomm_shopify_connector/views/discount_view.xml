@@ -102,7 +102,7 @@
         <field name="name">shopify.discount.list</field>
         <field name="model">shopify.discount</field>
         <field name="arch" type="xml">
-            <list string="Shopify Discounts" decoration-muted="active_discount == False">
+            <tree string="Shopify Discounts" decoration-muted="active_discount == False">
                 <field name="name"/>
                 <field name="discount_code"/>
                 <field name="value_type"/>
@@ -114,7 +114,7 @@
                 <field name="ends_at"/>
                 <field name="active_discount" widget="boolean_toggle"/>
                 <field name="shopify_instance_id"/>
-            </list>
+            </tree>
         </field>
     </record>
 

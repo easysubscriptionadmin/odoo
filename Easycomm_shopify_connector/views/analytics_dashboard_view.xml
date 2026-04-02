@@ -188,7 +188,7 @@
         <field name="name">shopify.top.products.list</field>
         <field name="model">product.product</field>
         <field name="arch" type="xml">
-            <list string="Top Selling Products" decoration-danger="qty_available &lt; 10">
+            <tree string="Top Selling Products" decoration-danger="qty_available &lt; 10">
                 <field name="image_128" widget="image" class="oe_avatar"/>
                 <field name="name"/>
                 <field name="default_code"/>
@@ -197,7 +197,7 @@
                 <field name="qty_available"/>
                 <field name="virtual_available"/>
                 <field name="uom_id"/>
-            </list>
+            </tree>
         </field>
     </record>
 
@@ -260,7 +260,7 @@
         <field name="name">shopify.recent.orders.list</field>
         <field name="model">sale.order</field>
         <field name="arch" type="xml">
-            <list string="Recent Orders" decoration-info="state == 'draft'" decoration-success="state == 'sale'" decoration-muted="state == 'cancel'">
+            <tree string="Recent Orders" decoration-info="state == 'draft'" decoration-success="state == 'sale'" decoration-muted="state == 'cancel'">
                 <field name="name" string="Order #"/>
                 <field name="date_order" widget="date"/>
                 <field name="partner_id"/>
@@ -269,7 +269,7 @@
                 <field name="shopify_financial_status" optional="show"/>
                 <field name="shopify_fulfillment_status" optional="show"/>
                 <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'sale'"/>
-            </list>
+            </tree>
         </field>
     </record>
 

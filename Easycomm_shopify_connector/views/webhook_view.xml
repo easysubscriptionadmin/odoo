@@ -25,14 +25,14 @@
         <field name="name">shopify.webhook.list</field>
         <field name="model">shopify.webhook</field>
         <field name="arch" type="xml">
-            <list string="Shopify Webhooks">
+            <tree string="Shopify Webhooks">
                 <field name="name"/>
                 <field name="shopify_instance_id"/>
                 <field name="topic"/>
                 <field name="webhook_url"/>
                 <field name="active" widget="boolean_toggle"/>
                 <field name="shopify_webhook_id"/>
-            </list>
+            </tree>
         </field>
     </record>
 

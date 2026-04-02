@@ -5,7 +5,7 @@
         <field name="name">shopify.sync.log.list</field>
         <field name="model">shopify.sync.log</field>
         <field name="arch" type="xml">
-            <list string="Sync Logs" decoration-success="status=='success'" decoration-danger="status=='failed'" decoration-warning="status=='partial'">
+            <tree string="Sync Logs" decoration-success="status=='success'" decoration-danger="status=='failed'" decoration-warning="status=='partial'">
                 <field name="name"/>
                 <field name="shopify_instance_id"/>
                 <field name="sync_type"/>
@@ -16,7 +16,7 @@
                 <field name="failed_count"/>
                 <field name="duration"/>
                 <field name="create_date"/>
-            </list>
+            </tree>
         </field>
     </record>
 

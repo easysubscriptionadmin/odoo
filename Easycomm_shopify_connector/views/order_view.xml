@@ -98,23 +98,23 @@
         <field name="model">sale.order</field>
         <field name="priority">20</field>
         <field name="arch" type="xml">
-            <list string="Shopify Quotations" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'">
+            <tree string="Shopify Quotations" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'">
                 <field name="name" string="Order"/>
                 <field name="shopify_order_number" string="Shopify #"/>
                 <field name="partner_id" string="Customer"/>
                 <field name="date_order" string="Order Date"/>
                 <field name="order_line" widget="many2many_tags" string="Products">
-                    <list>
+                    <tree>
                         <field name="product_id"/>
                         <field name="product_uom_qty"/>
                         <field name="price_unit"/>
-                    </list>
+                    </tree>
                 </field>
                 <field name="amount_total" string="Total" sum="Total"/>
                 <field name="shopify_financial_status" string="Payment"/>
                 <field name="shopify_fulfillment_status" string="Fulfillment"/>
                 <field name="state" invisible="1"/>
-            </list>
+            </tree>
         </field>
     </record>
 
@@ -151,14 +151,14 @@
                     <notebook>
                         <page string="Order Lines" name="order_lines">
                             <field name="order_line" nolabel="1">
-                                <list editable="bottom">
+                                <tree editable="bottom">
                                     <field name="sequence" widget="handle"/>
                                     <field name="product_id" string="Product"/>
                                     <field name="name" string="Description"/>
                                     <field name="product_uom_qty" string="Quantity"/>
                                     <field name="price_unit" string="Unit Price"/>
                                     <field name="price_subtotal" string="Subtotal" sum="Total"/>
-                                </list>
+                                </tree>
                             </field>
                             <group class="oe_subtotal_footer">
                                 <field name="amount_untaxed" string="Untaxed Amount"/>

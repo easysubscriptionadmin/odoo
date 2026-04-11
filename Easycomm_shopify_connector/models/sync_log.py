@@ -48,12 +48,13 @@ class ShopifySyncLog(models.Model):
 
     duration = fields.Float('Duration (seconds)', digits=(16, 2))
 
-    @api.model
-    def create(self, vals):
-        if vals.get('name', 'New') == 'New':
-            sync_type = vals.get('sync_type', 'sync')
-            vals['name'] = f"{sync_type.upper()}/{self.env['ir.sequence'].next_by_code('shopify.sync.log') or 'NEW'}"
-        return super(ShopifySyncLog, self).create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name', 'New') == 'New':
+                sync_type = vals.get('sync_type', 'sync')
+                vals['name'] = f"{sync_type.upper()}/{self.env['ir.sequence'].next_by_code('shopify.sync.log') or 'NEW'}"
+        return super(ShopifySyncLog, self).create(vals_list)
 
     @api.model
     def log_sync(self, instance_id, sync_type, direction, status, **kwargs):

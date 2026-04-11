@@ -69,7 +69,7 @@
     <record id="action_shopify_gift_card" model="ir.actions.act_window">
         <field name="name">Gift Cards</field>
         <field name="res_model">shopify.gift.card</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">tree,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No gift cards found

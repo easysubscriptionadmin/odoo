@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Shopify Odoo Connector Easycomm',
-    'version': '17.0.0',
+    'version': '17.0.1',
     'category': 'Sales/Integration',
     'summary': 'Unify your Shopify store with Odoo to automate workflows, reduce manual work, and scale faster.',
     'description': """

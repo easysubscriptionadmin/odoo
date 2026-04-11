@@ -85,11 +85,12 @@ class ShopifyScheduler(models.Model):
 
                 record.next_run = record.last_run + delta
 
-    @api.model
-    def create(self, vals):
-        record = super(ShopifyScheduler, self).create(vals)
-        record._create_cron_job()
-        return record
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super(ShopifyScheduler, self).create(vals_list)
+        for record in records:
+            record._create_cron_job()
+        return records
 
     def write(self, vals):
         res = super(ShopifyScheduler, self).write(vals)

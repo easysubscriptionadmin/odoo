@@ -156,7 +156,7 @@
                     <t t-name="kanban-box">
                         <div class="oe_kanban_global_click">
                             <div class="o_kanban_image">
-                                <img t-att-src="kanban_image('product.product', 'image_128', record.id.raw_value)" alt="Product" class="o_image_128_max"/>
+                                <img t-att-src="'/web/image/product.product/' + record.id.value + '/image_128'" alt="Product" class="o_image_128_max"/>
                             </div>
                             <div class="oe_kanban_details">
                                 <strong class="o_kanban_record_title">
@@ -170,7 +170,7 @@
                                 </div>
                                 <div class="o_kanban_record_bottom">
                                     <div class="oe_kanban_bottom_left">
-                                        <span class="badge badge-pill badge-info">
+                                        <span class="badge rounded-pill text-bg-info">
                                             Stock: <field name="qty_available"/>
                                         </span>
                                     </div>
@@ -224,7 +224,7 @@
                                             <field name="name"/>
                                         </strong>
                                     </div>
-                                    <span class="float-end badge badge-pill" t-attf-class="badge-#{record.state.raw_value == 'sale' ? 'success' : record.state.raw_value == 'draft' ? 'secondary' : 'warning'}">
+                                    <span class="float-end badge rounded-pill" t-attf-class="text-bg-#{record.state.raw_value == 'sale' ? 'success' : record.state.raw_value == 'draft' ? 'secondary' : 'warning'}">
                                         <field name="state"/>
                                     </span>
                                 </div>
@@ -239,10 +239,10 @@
                                         <field name="amount_total" widget="monetary"/>
                                     </div>
                                     <div class="oe_kanban_bottom_right">
-                                        <span t-if="record.shopify_financial_status.raw_value" class="badge badge-success">
+                                        <span t-if="record.shopify_financial_status.raw_value" class="badge text-bg-success">
                                             <field name="shopify_financial_status"/>
                                         </span>
-                                        <span t-if="record.shopify_fulfillment_status.raw_value" class="badge badge-info ml-1">
+                                        <span t-if="record.shopify_fulfillment_status.raw_value" class="badge text-bg-info ms-1">
                                             <field name="shopify_fulfillment_status"/>
                                         </span>
                                     </div>
@@ -277,10 +277,10 @@
     <record id="action_shopify_top_products_analytics" model="ir.actions.act_window">
         <field name="name">Top Selling Products</field>
         <field name="res_model">product.product</field>
-        <field name="view_mode">kanban,list,form</field>
+        <field name="view_mode">kanban,tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
             (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_shopify_top_products_kanban')}),
-            (0, 0, {'view_mode': 'list', 'view_id': ref('view_shopify_top_products_list')})]"/>
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('view_shopify_top_products_list')})]"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No products found
@@ -295,10 +295,10 @@
     <record id="action_shopify_recent_orders_analytics" model="ir.actions.act_window">
         <field name="name">Recent Orders</field>
         <field name="res_model">sale.order</field>
-        <field name="view_mode">kanban,list,form</field>
+        <field name="view_mode">kanban,tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
             (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_shopify_recent_orders_kanban')}),
-            (0, 0, {'view_mode': 'list', 'view_id': ref('view_shopify_recent_orders_list')})]"/>
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('view_shopify_recent_orders_list')})]"/>
         <field name="context">{'search_default_sales': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

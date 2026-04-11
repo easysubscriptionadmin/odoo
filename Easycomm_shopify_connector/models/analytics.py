@@ -273,7 +273,7 @@ class ShopifyAnalytics(models.TransientModel):
         product_ids = orders.mapped('order_line').mapped('product_id').ids
 
         # Use the custom action with kanban and list views
-        action = self.env.ref('shopify_connector.action_shopify_top_products_analytics').read()[0]
+        action = self.env.ref('Easycomm_shopify_connector.action_shopify_top_products_analytics').read()[0]
         action['domain'] = [('id', 'in', product_ids)]
         action['context'] = {
             'default_shopify_instance_id': self.shopify_instance_id.id,
@@ -295,7 +295,7 @@ class ShopifyAnalytics(models.TransientModel):
             domain.append(('date_order', '<=', self.date_to))
 
         # Use the custom action with kanban and list views
-        action = self.env.ref('shopify_connector.action_shopify_recent_orders_analytics').read()[0]
+        action = self.env.ref('Easycomm_shopify_connector.action_shopify_recent_orders_analytics').read()[0]
         action['domain'] = domain
         action['context'] = {
             'default_shopify_instance_id': self.shopify_instance_id.id,

@@ -259,7 +259,7 @@ class ShopifyDiscount(models.Model):
             'name': _('Products with Discount'),
             'type': 'ir.actions.act_window',
             'res_model': 'product.template',
-            'view_mode': 'list,form',
+            'view_mode': 'tree,form',
             'domain': [('id', 'in', products.ids)],
             'context': {'default_shopify_instance_id': self.shopify_instance_id.id}
         }

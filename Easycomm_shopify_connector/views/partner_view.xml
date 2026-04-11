@@ -75,7 +75,7 @@
     <record id="action_shopify_customer" model="ir.actions.act_window">
         <field name="name">Shopify Customers</field>
         <field name="res_model">res.partner</field>
-        <field name="view_mode">list,form,kanban</field>
+        <field name="view_mode">tree,form,kanban</field>
         <field name="domain">[('is_shopify_customer', '=', True)]</field>
         <field name="context">{'search_default_shopify_customers': 1}</field>
     </record>

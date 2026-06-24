@@ -11,6 +11,15 @@
                         <field name="shopify_instance_id"/>
                         <field name="shopify_operation"/>
                     </group>
+                    <group string="Product Import Options" invisible="shopify_operation != 'import_products'">
+                        <field name="import_product_variants"/>
+                        <field name="import_product_images"/>
+                        <field name="import_product_metafields"/>
+                        <div class="text-muted" colspan="2">
+                            All options on = a complete import: every variant, option, image and metafield,
+                            plus the full raw JSON of each product. Turning options off speeds up large imports.
+                        </div>
+                    </group>
                     <group string="Additional Options" invisible="shopify_operation not in ['import_orders', 'export_products', 'export_customers']">
                         <group invisible="shopify_operation != 'import_orders'" string="Date Range (optional)">
                             <field name="import_orders_from_date" string="From Date"/>

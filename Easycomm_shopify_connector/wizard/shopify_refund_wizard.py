@@ -32,9 +32,21 @@ class ShopifyRefundWizard(models.TransientModel):
 
     def action_create_refund(self):
         self.ensure_one()
-        return self.order_id.create_refund_in_shopify(
-            amount=self.refund_amount,
-            note=self.refund_note or '',
-            notify=self.notify_customer,
-            restock=self.restock,
-        )
+        try:
+            return self.order_id.create_refund_in_shopify(
+                amount=self.refund_amount,
+                note=self.refund_note or '',
+                notify=self.notify_customer,
+                restock=self.restock,
+            )
+        except UserError:
+            # Already a clean, user-facing message — let it through.
+            raise
+        except Exception as e:
+            _logger.error('Shopify refund failed for order %s: %s',
+                          self.order_id.name, e, exc_info=True)
+            raise UserError(_(
+                'Could not create the refund in Shopify.\n\n%s\n\n'
+                'Please check the order is still valid in Shopify and try again, '
+                'or review the server log for details.'
+            ) % e)

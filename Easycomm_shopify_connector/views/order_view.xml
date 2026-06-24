@@ -146,6 +146,7 @@
                             <field name="shopify_fulfillment_status" string="Fulfillment Status"/>
                             <field name="amount_total" string="Total Amount"/>
                             <field name="currency_id" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
                         </group>
                     </group>
                     <notebook>

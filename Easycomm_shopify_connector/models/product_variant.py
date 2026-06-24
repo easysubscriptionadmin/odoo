@@ -33,6 +33,20 @@ class ProductProduct(models.Model):
     shopify_fulfillment_service = fields.Char('Fulfillment Service', default='manual')
     shopify_inventory_management = fields.Char('Inventory Management', default='shopify')
 
+    # Full data captured on import
+    shopify_compare_at_price = fields.Float('Compare At Price')
+    shopify_inventory_quantity = fields.Float('Shopify Inventory Qty')
+    shopify_option1 = fields.Char('Option 1', copy=False)
+    shopify_option2 = fields.Char('Option 2', copy=False)
+    shopify_option3 = fields.Char('Option 3', copy=False)
+    shopify_variant_title = fields.Char('Variant Title', copy=False)
+    shopify_variant_created_at = fields.Datetime('Variant Created At')
+    shopify_variant_updated_at = fields.Datetime('Variant Updated At')
+    shopify_variant_raw_data = fields.Text('Variant Raw Data', copy=False,
+        help="Complete untouched JSON of this variant as received from Shopify.")
+    shopify_metafield_ids = fields.One2many(
+        'shopify.product.metafield', 'product_variant_id', string='Variant Metafields')
+
     def write(self, vals):
         result = super().write(vals)
         if self.env.context.get('shopify_sync_skip'):

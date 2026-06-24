@@ -1260,6 +1260,11 @@ class ShopifyWebhook(models.Model):
             f'financial_status="{new_status}"  refunded_amount={refunded_amount}'
         )
 
+        # Requirement #13: create a credit note in Odoo for the refund.
+        if refunded_amount > 0:
+            order.with_context(shopify_sync_skip=True).create_credit_note_from_shopify_refund(
+                refunded_amount, refund_id)
+
     def _handle_checkout(self, topic, data, instance):
         """Handle all checkouts/* webhooks — logged only (extend as needed)."""
         token = data.get('token', '')

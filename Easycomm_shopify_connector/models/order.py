@@ -195,11 +195,14 @@ class SaleOrder(models.Model):
                         # Create order lines if they don't exist
                         if not existing_order.order_line:
                             self._create_order_lines(existing_order, order_data.get('line_items', []))
+                            self._create_shipping_line(existing_order, order_data)
                         updated_count += 1
                 else:
                     new_order = self.with_context(**ctx).create(order_vals)
                     # Create order lines
                     self._create_order_lines(new_order, order_data.get('line_items', []))
+                    # Shipping charge as a dedicated service line (req #8)
+                    self._create_shipping_line(new_order, order_data)
                     created_count += 1
 
             except Exception as e:
@@ -366,21 +369,79 @@ class SaleOrder(models.Model):
                 else:
                     quantity = float(quantity) if quantity else 1.0
 
+                # Discount — Shopify allocates BOTH line-level and order-level
+                # discounts to each line via `discount_allocations`. Summing them
+                # and converting to a percentage covers requirement #7.
+                discount_amount = sum(
+                    float(da.get('amount', 0) or 0)
+                    for da in line_item.get('discount_allocations', [])
+                )
+                discount_pct = 0.0
+                if discount_amount and price and quantity:
+                    discount_pct = min(100.0, (discount_amount / (price * quantity)) * 100.0)
+
                 line_vals = {
                     'order_id': order.id,
                     'product_id': product.id,
                     'name': line_item.get('title') or line_item.get('name') or product.name,
                     'product_uom_qty': quantity,
                     'price_unit': price,
+                    'discount': discount_pct,
                     'shopify_line_id': str(line_item.get('id', '')),
                 }
 
-                order_line_obj.create(line_vals)
-                _logger.info(f"Created order line: {line_item.get('title')} - Qty: {quantity} - Price: {price}")
+                order_line_obj.with_context(shopify_sync_skip=True).create(line_vals)
+                _logger.info(
+                    f"Created order line: {line_item.get('title')} - Qty: {quantity} "
+                    f"- Price: {price} - Discount: {discount_pct:.2f}%"
+                )
 
             except Exception as e:
                 _logger.error(f"Error creating order line for {line_item.get('title')}: {str(e)}")
                 continue
+
+    def _get_shipping_product(self):
+        """Return (or create) the service product used for Shopify shipping charges."""
+        product = self.env['product.product'].search(
+            [('default_code', '=', 'SHOPIFY_SHIPPING')], limit=1)
+        if not product:
+            product = self.env['product.product'].create({
+                'name': 'Shipping',
+                'default_code': 'SHOPIFY_SHIPPING',
+                'type': 'service',
+                'invoice_policy': 'order',
+                'sale_ok': True,
+                'purchase_ok': False,
+                'list_price': 0.0,
+            })
+        return product
+
+    def _create_shipping_line(self, order, order_data):
+        """Add the Shopify shipping charge as a dedicated service line so it
+        appears on both the Sales Order and the Invoice (requirement #8)."""
+        shipping_lines = order_data.get('shipping_lines', [])
+        if not shipping_lines:
+            return
+        total = 0.0
+        titles = []
+        for sl in shipping_lines:
+            price = float(sl.get('price', 0) or 0)
+            # Subtract any shipping discounts allocated by Shopify
+            disc = sum(float(d.get('amount', 0) or 0) for d in sl.get('discount_allocations', []))
+            total += price - disc
+            if sl.get('title'):
+                titles.append(sl['title'])
+        if total <= 0:
+            return
+        product = self._get_shipping_product()
+        self.env['sale.order.line'].with_context(shopify_sync_skip=True).create({
+            'order_id': order.id,
+            'product_id': product.id,
+            'name': ', '.join(titles) or _('Shipping'),
+            'product_uom_qty': 1,
+            'price_unit': total,
+        })
+        _logger.info(f'Created shipping line for order {order.name}: {total}')
 
     def _create_generic_product(self, line_item, instance):
         """Create a generic product when product cannot be found"""
@@ -518,7 +579,7 @@ class SaleOrder(models.Model):
                 'province': ship.state_id.name if ship.state_id else '',
                 'country': ship.country_id.code if ship.country_id else '',
                 'zip': ship.zip or '',
-                'phone': ship.phone or ship.mobile or '',
+                'phone': ship.phone or getattr(ship, 'mobile', '') or '',
             }
 
         url = f"{instance._get_base_url()}/draft_orders.json"
@@ -600,7 +661,7 @@ class SaleOrder(models.Model):
             'address2': partner.street2 or '',
             'city': partner.city or '',
             'zip': partner.zip or '',
-            'phone': partner.phone or partner.mobile or '',
+            'phone': partner.phone or getattr(partner, 'mobile', '') or '',
             'company': partner.commercial_company_name or '',
         }
         if partner.country_id:
@@ -935,23 +996,92 @@ class SaleOrder(models.Model):
                 )
                 restock_type = 'no_restock'
 
+        # ── Build refund_line_items ────────────────────────────────────────────
+        # Only needed when the user wants to restock items.
+        # For a pure monetary refund (restock=False) Shopify only needs the
+        # transactions entry — sending refund_line_items with the full ordered
+        # quantity would fail on partially-refunded or already-refunded orders
+        # with: "cannot refund more items than were purchased".
         refund_line_items = []
-        for line in self.order_line:
-            if not line.shopify_line_id:
-                continue
-            item = {
-                'line_item_id': int(line.shopify_line_id),
-                'quantity': int(line.product_uom_qty),
-                'restock_type': restock_type,
-            }
-            if restock_type == 'return' and location_id:
-                item['location_id'] = location_id
-            refund_line_items.append(item)
+        if restock:
+            # Fetch already-refunded quantities so we cap at what remains
+            already_refunded = {}  # {line_item_id: qty already refunded}
+            try:
+                refunds_url = (
+                    f"{instance._get_base_url()}"
+                    f"/orders/{self.shopify_order_id}/refunds.json"
+                )
+                r = requests.get(
+                    refunds_url, headers=instance._get_headers(),
+                    timeout=30, verify=certifi.where(),
+                )
+                if r.status_code == 200:
+                    for prev in r.json().get('refunds', []):
+                        for rli in prev.get('refund_line_items', []):
+                            lid = rli.get('line_item_id')
+                            already_refunded[lid] = (
+                                already_refunded.get(lid, 0) + rli.get('quantity', 0)
+                            )
+                    _logger.info(
+                        f'[create_refund_in_shopify] Already-refunded qtys: '
+                        f'{already_refunded}'
+                    )
+                else:
+                    _logger.warning(
+                        f'[create_refund_in_shopify] Could not fetch existing refunds '
+                        f'({r.status_code}) — will use full ordered qty (may fail)'
+                    )
+            except Exception as e:
+                _logger.warning(
+                    f'[create_refund_in_shopify] Error fetching existing refunds: {e} '
+                    f'— will use full ordered qty'
+                )
 
-        if not refund_line_items:
+            for line in self.order_line:
+                # Skip lines without a numeric Shopify line-item id. Lines added
+                # via the Order-Editing API can carry a non-numeric (UUID/GID)
+                # id that is not a refundable line_item_id.
+                if not line.shopify_line_id or not str(line.shopify_line_id).isdigit():
+                    if line.shopify_line_id:
+                        _logger.info(
+                            '[create_refund_in_shopify] Skipping line "%s" — non-numeric '
+                            'shopify_line_id=%s (not refundable by line)',
+                            line.name, line.shopify_line_id)
+                    continue
+                line_id = int(line.shopify_line_id)
+                ordered_qty = int(line.product_uom_qty)
+                already = already_refunded.get(line_id, 0)
+                remaining = ordered_qty - already
+                if remaining <= 0:
+                    _logger.info(
+                        f'[create_refund_in_shopify] Line {line_id} fully refunded '
+                        f'already (ordered={ordered_qty}, refunded={already}) — skipping'
+                    )
+                    continue
+                item = {
+                    'line_item_id': line_id,
+                    'quantity': remaining,
+                    'restock_type': restock_type,
+                }
+                if restock_type == 'return' and location_id:
+                    item['location_id'] = location_id
+                refund_line_items.append(item)
+                _logger.info(
+                    f'[create_refund_in_shopify] Line {line_id}: '
+                    f'refunding qty={remaining} (ordered={ordered_qty}, '
+                    f'already_refunded={already})'
+                )
+
+        if not refund_line_items and restock:
             _logger.warning(
-                f'[create_refund_in_shopify] Could not resolve any Shopify line IDs for '
-                f'order {self.name} — will rely on transaction entry only.'
+                f'[create_refund_in_shopify] restock=True but no refundable lines found '
+                f'for order {self.name} — all lines may already be fully refunded. '
+                f'Proceeding with monetary refund only.'
+            )
+        elif not restock:
+            _logger.info(
+                f'[create_refund_in_shopify] restock=False — skipping refund_line_items, '
+                f'using transactions entry only for monetary refund'
             )
 
         refund_payload = {
@@ -1082,6 +1212,55 @@ class SaleOrder(models.Model):
         except Exception as e:
             _logger.error(f'Error creating refund in Shopify: {str(e)}')
             raise UserError(_('Error creating refund in Shopify: %s') % str(e))
+
+    def create_credit_note_from_shopify_refund(self, refunded_amount, refund_id=None):
+        """Create a DRAFT customer credit note in Odoo when a refund happens in
+        Shopify (requirement #13: Shopify → Odoo return/credit note).
+
+        - If the order has a posted customer invoice, the credit note is created
+          as a reversal of that invoice (draft, for the accountant to review).
+        - Idempotent: skips if a credit note for this refund already exists.
+        Best-effort and never raises (so it can't break the webhook).
+        """
+        self.ensure_one()
+        try:
+            ref_tag = f'Shopify Refund {refund_id}' if refund_id else f'Shopify Refund {self.name}'
+
+            # Idempotency: don't create twice for the same refund.
+            existing = self.env['account.move'].sudo().search([
+                ('move_type', '=', 'out_refund'),
+                ('ref', '=', ref_tag),
+            ], limit=1)
+            if existing:
+                _logger.info(f'[credit_note] Credit note for {ref_tag} already exists ({existing.name}) — skipping')
+                return existing
+
+            posted_invoices = self.invoice_ids.filtered(
+                lambda m: m.move_type == 'out_invoice' and m.state == 'posted')
+
+            if posted_invoices:
+                invoice = posted_invoices[0]
+                move_reversal = self.env['account.move.reversal'].sudo().with_context(
+                    active_model='account.move', active_ids=invoice.ids
+                ).create({
+                    'reason': ref_tag,
+                    'journal_id': invoice.journal_id.id,
+                })
+                reversal_action = move_reversal.reverse_moves()
+                credit_note = self.env['account.move'].sudo().browse(reversal_action.get('res_id'))
+                if credit_note:
+                    credit_note.ref = ref_tag
+                _logger.info(f'[credit_note] Created draft credit note {credit_note.name} from invoice {invoice.name}')
+                return credit_note
+
+            _logger.info(
+                f'[credit_note] Order {self.name} has no posted invoice — '
+                f'cannot create a reversal credit note for {ref_tag} (skipped)'
+            )
+            return False
+        except Exception as e:
+            _logger.warning(f'[credit_note] Failed to create credit note for {self.name}: {e}')
+            return False
 
     def action_open_refund_wizard(self):
         """Open the Shopify refund wizard"""
@@ -1905,6 +2084,14 @@ class AccountMove(models.Model):
             return result
         for move in self:
             if move.move_type != 'out_refund':
+                continue
+            # Skip credit notes that ORIGINATED from a Shopify refund — refunding
+            # again in Shopify would double-refund the customer (requirement #13).
+            if move.ref and str(move.ref).startswith('Shopify Refund'):
+                _logger.info(
+                    f'[AccountMove.action_post] Credit note {move.name} originated from a '
+                    f'Shopify refund — not pushing back to Shopify'
+                )
                 continue
             sale_order = self._get_shopify_sale_order_from_refund(move)
             if not sale_order:

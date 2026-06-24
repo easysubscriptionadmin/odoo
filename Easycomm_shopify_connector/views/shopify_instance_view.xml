@@ -7,7 +7,12 @@
         <field name="arch" type="xml">
             <form string="Shopify Instance">
                 <header>
-                    <button name="test_connection" type="object" string="Test Connection" class="oe_highlight"/>
+                    <button name="action_generate_access_token" type="object"
+                            string="Generate Access Token" class="oe_highlight"
+                            invisible="not api_key or not api_secret"
+                            help="Fetch an Admin API access token from Shopify using the Client ID/Secret (client credentials grant)."/>
+                    <button name="test_connection" type="object" string="Test Connection"
+                            invisible="not access_token"/>
                 </header>
                 <sheet>
                     <group>
@@ -21,9 +26,17 @@
                         <group>
                             <field name="api_key"/>
                             <field name="api_secret" password="True"/>
-                            <field name="access_token" password="True"/>
+                            <field name="access_token" password="True"
+                                   placeholder="Leave empty and click 'Generate Access Token'"/>
+                            <field name="token_expires_at" readonly="1"/>
                         </group>
                     </group>
+                    <div class="alert alert-info" role="alert"
+                         invisible="access_token">
+                        No access token yet? Enter your <b>Client ID</b> and <b>Client Secret</b>, save,
+                        then click <b>Generate Access Token</b>. Odoo fetches the token directly from
+                        Shopify and refreshes it automatically when it expires.
+                    </div>
                     <group string="Last Sync Information">
                         <group>
                             <field name="last_product_sync"/>

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Shopify Odoo Connector Easycomm',
-    'version': '19.0.1.0.0',
+    'version': '19.0.0',
     'category': 'Sales/Integration',
     'summary': 'Unify your Shopify store with Odoo to automate workflows, reduce manual work, and scale faster.',
     'description': """
@@ -43,6 +43,7 @@ Key Features:
         'stock',
         'product',
         'contacts',
+        'account',
     ],
     'external_dependencies': {
         'python': ['requests'],
@@ -66,6 +67,7 @@ Key Features:
         'views/inventory_location_view.xml',
         'views/discount_view.xml',
         'wizard/shopify_operation_view.xml',
+        'wizard/shopify_refund_wizard_view.xml',
         'views/menu_view.xml',
     ],
     'demo': [],

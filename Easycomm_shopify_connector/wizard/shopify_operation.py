@@ -27,6 +27,17 @@ class ShopifyOperation(models.TransientModel):
         ('export_customers', 'Export Customers to Shopify'),
     ], string='Operation', required=True, default='import_products')
 
+    # For full product import (capture everything)
+    import_product_images = fields.Boolean(
+        'Import Images', default=True,
+        help='Download and store all product and variant images.')
+    import_product_variants = fields.Boolean(
+        'Import Variants & Options', default=True,
+        help='Create every variant with all its fields (price, sku, barcode, weight, options, etc.).')
+    import_product_metafields = fields.Boolean(
+        'Import Metafields', default=True,
+        help='Fetch and store all product and variant metafields.')
+
     # For order import date range filter
     import_orders_from_date = fields.Datetime(
         'Orders From',
@@ -80,15 +91,71 @@ class ShopifyOperation(models.TransientModel):
             return self._export_customers()
 
     def _import_products(self):
-        """Import products from Shopify"""
-        _logger.info(f'Starting product import from Shopify instance: {self.shopify_instance_id.name}')
+        """Import products from Shopify in a background thread.
 
-        try:
-            result = self.env['product.template'].import_shopify_products(self.shopify_instance_id.id)
-            return result
-        except Exception as e:
-            _logger.error(f'Error in product import: {str(e)}')
-            raise UserError(_('Product import failed: %s') % str(e))
+        Runs in its own cursor so the import is NOT killed by the HTTP request
+        time limit (limit_time_real). Each product is committed individually by
+        import_shopify_products, so products appear progressively and a single
+        failure never discards the rest.
+        """
+        instance_id = self.shopify_instance_id.id
+        instance_name = self.shopify_instance_id.name
+        skip_images = not self.import_product_images
+        import_variants = self.import_product_variants
+        import_metafields = self.import_product_metafields
+        uid = self.env.uid
+        registry = self.env.registry
+
+        _logger.info(f'Scheduling background product import for instance: {instance_name}')
+
+        def run_import():
+            import odoo
+            with registry.cursor() as cr:
+                env = odoo.api.Environment(cr, uid, {})
+                try:
+                    env['product.template'].import_shopify_products(
+                        instance_id,
+                        skip_images=skip_images,
+                        import_variants=import_variants,
+                        import_metafields=import_metafields,
+                    )
+                    cr.commit()
+                    partner = env['res.users'].browse(uid).partner_id
+                    env['bus.bus']._sendone(partner, 'simple_notification', {
+                        'title': _('Product Import Complete'),
+                        'message': _('Products imported from %s.') % instance_name,
+                        'type': 'success',
+                    })
+                    cr.commit()
+                except Exception as exc:
+                    _logger.error(f'Background product import failed: {exc}', exc_info=True)
+                    try:
+                        partner = env['res.users'].browse(uid).partner_id
+                        env['bus.bus']._sendone(partner, 'simple_notification', {
+                            'title': _('Product Import Failed'),
+                            'message': str(exc),
+                            'type': 'danger',
+                        })
+                        cr.commit()
+                    except Exception:
+                        pass
+
+        threading.Thread(target=run_import, daemon=True).start()
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Product Import Started'),
+                'message': _(
+                    'Importing products from %s in the background. They will appear '
+                    'progressively in Products — refresh to see them. You will get a '
+                    'notification when it finishes.'
+                ) % instance_name,
+                'type': 'info',
+                'sticky': False,
+            }
+        }
 
     def _import_customers(self):
         """Import customers from Shopify"""

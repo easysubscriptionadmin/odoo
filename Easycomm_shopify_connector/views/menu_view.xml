@@ -2,9 +2,9 @@
 <odoo>
     <!-- Main Shopify Menu -->
     <menuitem id="shopify_menu_root"
-              name="Shopify"
+              name="Shopify Odoo Connector"
               sequence="20"
-              web_icon="shopify_connector,static/description/icon.png"/>
+              web_icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOjfiU7xpuCHpFF7gb4G0-t-Jsf5RdH2YRXQ&amp;s"/>
 
     <!-- Sales Menu -->
     <menuitem id="shopify_sales_menu"

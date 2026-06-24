@@ -54,15 +54,14 @@ class ShopifyInventorySync(models.Model):
 
             synced_count = 0
             errors = []
+            location_id = self._get_shopify_location_id(instance)
 
             for product in products:
                 try:
-                    # Get inventory from Odoo
-                    if product.product_variant_id:
-                        qty_available = product.product_variant_id.qty_available
-
-                        # Update in Shopify
-                        self._update_shopify_inventory(instance, product, qty_available)
+                    # Sync EVERY variant — available qty = on hand - reserved (free_qty)
+                    for variant in product.product_variant_ids:
+                        available = variant.free_qty  # on hand minus reserved
+                        self._set_variant_inventory(instance, variant, available, location_id)
                         synced_count += 1
                 except Exception as e:
                     error_msg = f"Product {product.name}: {str(e)}"
@@ -92,38 +91,48 @@ class ShopifyInventorySync(models.Model):
             })
             raise UserError(_('Inventory sync failed: %s') % str(e))
 
-    def _update_shopify_inventory(self, instance, product, quantity):
-        """Update inventory quantity in Shopify"""
-        # First, get the inventory item ID
-        variant_id = product.shopify_product_id
-        url = f"{instance._get_base_url()}/products/{product.shopify_product_id}.json"
-        response = requests.get(url, headers=instance._get_headers(), timeout=10, verify=certifi.where())
+    def _set_variant_inventory(self, instance, variant, quantity, location_id=None):
+        """Set the available quantity of a single variant in Shopify.
 
-        if response.status_code == 200:
-            product_data = response.json().get('product', {})
-            variants = product_data.get('variants', [])
-            if variants:
-                inventory_item_id = variants[0].get('inventory_item_id')
-                location_id = self._get_shopify_location_id(instance)
+        `quantity` should already be the available stock (on hand - reserved).
+        Uses the variant's stored inventory_item_id, fetching it from Shopify
+        if not present.
+        """
+        inventory_item_id = variant.shopify_inventory_item_id
+        # Fallback: fetch the inventory_item_id from Shopify if not stored yet.
+        if not inventory_item_id and variant.shopify_variant_id:
+            try:
+                vurl = f"{instance._get_base_url()}/variants/{variant.shopify_variant_id}.json"
+                vresp = requests.get(vurl, headers=instance._get_headers(), timeout=10, verify=certifi.where())
+                if vresp.status_code == 200:
+                    inventory_item_id = vresp.json().get('variant', {}).get('inventory_item_id')
+                    if inventory_item_id:
+                        variant.with_context(shopify_sync_skip=True).shopify_inventory_item_id = str(inventory_item_id)
+            except Exception as e:
+                _logger.warning(f'Could not fetch inventory_item_id for variant {variant.id}: {e}')
 
-                # Update inventory level
-                inventory_url = f"{instance._get_base_url()}/inventory_levels/set.json"
-                inventory_data = {
-                    'location_id': location_id,
-                    'inventory_item_id': inventory_item_id,
-                    'available': int(quantity)
-                }
+        if not inventory_item_id:
+            _logger.warning(f'Variant {variant.display_name} has no Shopify inventory_item_id — skipping')
+            return
 
-                inv_response = requests.post(
-                    inventory_url,
-                    headers=instance._get_headers(),
-                    json=inventory_data,
-                    timeout=10,
-                    verify=certifi.where()
-                )
+        if location_id is None:
+            location_id = self._get_shopify_location_id(instance)
 
-                if inv_response.status_code not in [200, 201]:
-                    raise UserError(_('Failed to update inventory: %s') % inv_response.text)
+        inventory_url = f"{instance._get_base_url()}/inventory_levels/set.json"
+        inventory_data = {
+            'location_id': location_id,
+            'inventory_item_id': int(inventory_item_id),
+            'available': int(quantity),
+        }
+        inv_response = requests.post(
+            inventory_url,
+            headers=instance._get_headers(),
+            json=inventory_data,
+            timeout=10,
+            verify=certifi.where(),
+        )
+        if inv_response.status_code not in [200, 201]:
+            raise UserError(_('Failed to update inventory for %s: %s') % (variant.display_name, inv_response.text))
 
     def _get_shopify_location_id(self, instance):
         """Get the primary Shopify location ID"""

@@ -6,12 +6,31 @@
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_shopify_sync_wizard" type="object"
+                        class="oe_stat_button" icon="fa-shopping-cart">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Sync to</span>
+                        <span class="o_stat_text">Shopify</span>
+                    </div>
+                </button>
+            </xpath>
             <xpath expr="//page[@name='general_information']" position="after">
-                <page string="Shopify" name="shopify" invisible="is_shopify_product == False and shopify_instance_id == False">
+                <page string="Shopify" name="shopify">
+                    <div class="alert alert-success" role="alert" invisible="not shopify_product_id">
+                        This product is linked to Shopify. Click <b>Sync to Shopify</b> again to push the latest changes.
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="shopify_product_id">
+                        This product is <b>not on Shopify yet</b>. Click <b>Sync to Shopify</b>, pick the store
+                        (instance) to publish it to, and it will be created there.
+                    </div>
+                    <button name="action_open_shopify_sync_wizard" type="object"
+                            string="Sync to Shopify" class="btn-primary" icon="fa-shopping-cart"/>
                     <group>
                         <group>
                             <field name="is_shopify_product"/>
-                            <field name="shopify_instance_id"/>
+                            <field name="shopify_instance_id"
+                                   options="{'no_create': True, 'no_open': True}"/>
                             <field name="shopify_product_id" readonly="1"/>
                             <field name="shopify_product_status"/>
                         </group>
@@ -19,21 +38,73 @@
                             <field name="shopify_product_type"/>
                             <field name="shopify_vendor"/>
                             <field name="shopify_tags"/>
+                            <field name="shopify_handle" readonly="1"/>
+                            <field name="shopify_template_suffix" readonly="1"/>
                             <field name="shopify_published_at" readonly="1"/>
                         </group>
                     </group>
-                    <group string="Sync Information">
+                    <group string="Sync Information" invisible="not shopify_product_id">
                         <group>
                             <field name="shopify_created_at" readonly="1"/>
                             <field name="shopify_updated_at" readonly="1"/>
                         </group>
                     </group>
-                    <div class="oe_chatter">
-                        <button name="export_product_to_shopify"
-                                type="object"
-                                string="Export to Shopify"
-                                class="oe_highlight"
-                                invisible="shopify_instance_id == False"/>
+                    <div invisible="not is_shopify_product">
+                    <separator string="Media (all images)"/>
+                    <field name="shopify_image_ids" readonly="1" nolabel="1">
+                        <list>
+                            <field name="image_128" widget="image" options="{'size': [64, 64]}" string="Image"/>
+                            <field name="name"/>
+                            <field name="sequence" string="Position"/>
+                            <field name="src" string="URL" optional="hide"/>
+                        </list>
+                    </field>
+
+                    <separator string="Variants (price · media · quantity)"/>
+                    <field name="product_variant_ids" readonly="1" nolabel="1">
+                        <list>
+                            <field name="image_128" widget="image" options="{'size': [40, 40]}" string="Image"/>
+                            <field name="shopify_variant_title" string="Variant"/>
+                            <field name="default_code" string="SKU"/>
+                            <field name="barcode" string="Barcode"/>
+                            <field name="lst_price" string="Price"/>
+                            <field name="shopify_compare_at_price" string="Compare At"/>
+                            <field name="shopify_inventory_quantity" string="Shopify Qty"/>
+                            <field name="qty_available" string="On Hand"/>
+                            <field name="shopify_variant_id" string="Shopify Variant ID" optional="hide"/>
+                        </list>
+                    </field>
+
+                    <separator string="Product Metafields"/>
+                    <field name="shopify_metafield_ids" readonly="1" nolabel="1">
+                        <list>
+                            <field name="label" string="Field"/>
+                            <field name="display_value" string="Value"
+                                   decoration-muted="not is_set"/>
+                            <field name="is_set" column_invisible="1"/>
+                            <field name="namespace" optional="hide"/>
+                            <field name="key" optional="show"/>
+                            <field name="type" optional="hide"/>
+                        </list>
+                    </field>
+
+                    <separator string="Variant Metafields"/>
+                    <field name="shopify_variant_metafield_ids" readonly="1" nolabel="1">
+                        <list>
+                            <field name="product_variant_id" string="Variant"/>
+                            <field name="label" string="Field"/>
+                            <field name="display_value" string="Value"
+                                   decoration-muted="not is_set"/>
+                            <field name="is_set" column_invisible="1"/>
+                            <field name="key" optional="show"/>
+                            <field name="type" optional="hide"/>
+                        </list>
+                    </field>
+
+                    <group string="Raw Data (every key from Shopify)">
+                        <field name="shopify_options_json" readonly="1" widget="text" nolabel="1"/>
+                        <field name="shopify_raw_data" readonly="1" widget="text" nolabel="1"/>
+                    </group>
                     </div>
                 </page>
             </xpath>

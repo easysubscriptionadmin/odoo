@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sync Products to Shopify wizard -->
+    <record id="view_shopify_product_sync_wizard_form" model="ir.ui.view">
+        <field name="name">shopify.product.sync.wizard.form</field>
+        <field name="model">shopify.product.sync.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sync to Shopify">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        Choose the Shopify store (instance) to create/update the selected product(s) in.
+                    </div>
+                    <group>
+                        <field name="shopify_instance_id"
+                               options="{'no_create': True, 'no_open': True}"/>
+                        <field name="export_images"/>
+                        <field name="product_count"/>
+                    </group>
+                    <field name="product_ids">
+                        <list>
+                            <field name="name"/>
+                            <field name="default_code"/>
+                            <field name="shopify_product_id"/>
+                            <field name="shopify_instance_id"/>
+                        </list>
+                    </field>
+                </sheet>
+                <footer>
+                    <button name="action_sync" type="object" string="Sync to Shopify" class="oe_highlight"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action (also bound to product list "Action" menu) -->
+    <record id="action_shopify_product_sync_wizard" model="ir.actions.act_window">
+        <field name="name">Sync to Shopify</field>
+        <field name="res_model">shopify.product.sync.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="product.model_product_template"/>
+        <field name="binding_view_types">list,form</field>
+    </record>
+</odoo>

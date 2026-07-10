@@ -20,6 +20,12 @@ class ShopifyProductSyncWizard(models.TransientModel):
     export_images = fields.Boolean(
         'Also Export Images', default=True,
         help='Upload the product images to Shopify (only for newly created products, to avoid duplicates).')
+    export_metafields = fields.Boolean(
+        'Also Export Metafields', default=True,
+        help='Upsert the product and variant metafields in Shopify.')
+    export_inventory = fields.Boolean(
+        'Also Export Quantity', default=True,
+        help='Push each variant available quantity (on hand - reserved) to Shopify.')
 
     @api.depends('product_ids')
     def _compute_product_count(self):
@@ -51,18 +57,31 @@ class ShopifyProductSyncWizard(models.TransientModel):
         if not self.product_ids:
             raise UserError(_('Please select at least one product to sync.'))
 
-        success, errors = 0, []
+        success, errors, warnings = 0, [], []
         for product in self.product_ids:
             try:
                 product.shopify_instance_id = self.shopify_instance_id.id
-                product.export_product_to_shopify(export_images=self.export_images)
+                result = product.export_product_to_shopify(
+                    export_images=self.export_images,
+                    export_metafields=self.export_metafields,
+                    export_inventory=self.export_inventory,
+                )
                 success += 1
+                # Surface per-product push warnings (e.g. missing write_inventory scope)
+                params = (result or {}).get('params', {})
+                if params.get('type') == 'warning' and params.get('message'):
+                    warn = params['message'].replace(
+                        _('Product exported to Shopify successfully'), '').strip()
+                    if warn and warn not in warnings:
+                        warnings.append(warn)
             except Exception as e:
                 errors.append(f"{product.name}: {e}")
                 _logger.error('Sync to Shopify failed for %s: %s', product.name, e)
 
         message = _('Synced %(ok)s product(s) to %(store)s.') % {
             'ok': success, 'store': self.shopify_instance_id.name}
+        if warnings:
+            message += '\n\n' + '\n'.join(warnings[:3])
         if errors:
             message += _('\nFailed: %s') % len(errors)
             message += '\n\n' + '\n'.join(errors[:5])
@@ -73,8 +92,8 @@ class ShopifyProductSyncWizard(models.TransientModel):
             'params': {
                 'title': _('Shopify Sync'),
                 'message': message,
-                'type': 'warning' if errors else 'success',
-                'sticky': bool(errors),
+                'type': 'warning' if (errors or warnings) else 'success',
+                'sticky': bool(errors or warnings),
                 'next': {'type': 'ir.actions.act_window_close'},
             },
         }

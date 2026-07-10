@@ -253,6 +253,7 @@ class ShopifyDiscount(models.Model):
         products = self.env['product.template'].search([
             ('shopify_product_id', 'in', [str(pid) for pid in product_ids]),
             ('shopify_instance_id', '=', self.shopify_instance_id.id)
+            
         ])
 
         return {
@@ -292,3 +293,4 @@ class ShopifyDiscount(models.Model):
         except Exception as e:
             _logger.error(f'Error syncing discount: {str(e)}')
             raise UserError(_('Failed to sync discount: %s') % str(e))
+

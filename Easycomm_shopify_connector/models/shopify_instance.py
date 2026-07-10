@@ -4,10 +4,15 @@ from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from datetime import timedelta
 import logging
+import threading
 import requests
 import certifi
 
 _logger = logging.getLogger(__name__)
+
+# Guard against double-starting the definitions/metaobjects fetch.
+_defs_lock = threading.Lock()
+_defs_running = {}
 
 # Refresh the token this many seconds before it actually expires.
 TOKEN_REFRESH_MARGIN = 60
@@ -125,7 +130,7 @@ class ShopifyInstance(models.Model):
         query($ownerType: MetafieldOwnerType!, $after: String) {
           metafieldDefinitions(first: 250, ownerType: $ownerType, after: $after) {
             edges {
-              node { name namespace key description type { name } }
+              node { name namespace key description type { name } validations { name value } }
             }
             pageInfo { hasNextPage endCursor }
           }
@@ -137,12 +142,28 @@ class ShopifyInstance(models.Model):
                 block = data.get('metafieldDefinitions', {})
                 for edge in block.get('edges', []):
                     node = edge.get('node', {})
+                    # metaobject-reference definitions carry the metaobject
+                    # definition id in their validations.
+                    metaobject_gid = ''
+                    for v in node.get('validations') or []:
+                        if v.get('name') in ('metaobject_definition_id', 'metaobject_definition_ids'):
+                            raw = v.get('value') or ''
+                            if raw.startswith('['):
+                                try:
+                                    import json as _json
+                                    ids = _json.loads(raw)
+                                    raw = ids[0] if ids else ''
+                                except Exception:
+                                    raw = ''
+                            metaobject_gid = raw
+                            break
                     definitions.append({
                         'namespace': node.get('namespace') or '',
                         'key': node.get('key') or '',
                         'name': node.get('name') or '',
                         'type': (node.get('type') or {}).get('name') or '',
                         'description': node.get('description') or '',
+                        'metaobject_definition_gid': metaobject_gid,
                     })
                 page = block.get('pageInfo', {})
                 if page.get('hasNextPage'):
@@ -152,6 +173,266 @@ class ShopifyInstance(models.Model):
         except Exception as e:
             _logger.warning('[Shopify] Could not fetch %s metafield definitions: %s', owner_type, e)
         return definitions
+
+    def _upsert_definition(self, owner_type, namespace, key, name='', mtype='',
+                           description='', metaobject_definition_gid=''):
+        """Create or update a single metafield definition record. Returns True
+        if a new record was created."""
+        Definition = self.env['shopify.metafield.definition']
+        vals = {
+            'name': name or key or '',
+            'namespace': namespace or '',
+            'key': key or '',
+            'type': mtype or '',
+            'description': description or '',
+            'owner_type': owner_type,
+            'shopify_instance_id': self.id,
+            'metaobject_definition_gid': metaobject_definition_gid or '',
+        }
+        existing = Definition.search([
+            ('shopify_instance_id', '=', self.id),
+            ('owner_type', '=', owner_type),
+            ('namespace', '=', vals['namespace']),
+            ('key', '=', vals['key']),
+        ], limit=1)
+        if existing:
+            # never blank an already-known metaobject link (e.g. when a later
+            # derive-from-metafields pass has no validations data)
+            if not vals['metaobject_definition_gid']:
+                vals.pop('metaobject_definition_gid')
+            existing.write(vals)
+            return False
+        Definition.create(vals)
+        return True
+
+    def action_fetch_metafield_definitions(self):
+        """Populate shopify.metafield.definition records for the Field dropdown.
+
+        Two sources are combined so the dropdown is always usable:
+          1. Shopify's metafield DEFINITIONS via GraphQL (needs the read access).
+          2. The metafields already imported onto products/variants (works even
+             when the definitions API is restricted).
+        """
+        self.ensure_one()
+        created = 0
+
+        # Runs in the BACKGROUND: fetching all definitions + metaobject values
+        # exceeds the 120s web-request limit on stores with many metaobjects
+        # ("Connection lost"). Progress arrives via notification toasts.
+        instance_id = self.id
+        instance_name = self.name
+        uid = self.env.uid
+        registry = self.env.registry
+        run_key = (self.env.cr.dbname, instance_id)
+
+        with _defs_lock:
+            if _defs_running.get(run_key):
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': _('Already Running'),
+                        'message': _('A metafield fetch for %s is already in progress.') % instance_name,
+                        'type': 'warning',
+                    },
+                }
+            _defs_running[run_key] = True
+
+        def run_fetch():
+            import odoo
+            try:
+                with registry.cursor() as cr:
+                    env = odoo.api.Environment(cr, uid, {})
+                    env['shopify.instance'].browse(instance_id)._run_definitions_sync(notify_uid=uid)
+                    cr.commit()
+            except Exception as exc:
+                _logger.error('Background metafield fetch failed: %s', exc, exc_info=True)
+                try:
+                    with registry.cursor() as cr:
+                        env = odoo.api.Environment(cr, uid, {})
+                        partner = env['res.users'].browse(uid).partner_id
+                        env['bus.bus']._sendone(partner, 'simple_notification', {
+                            'title': _('Metafield Fetch Failed'),
+                            'message': str(exc),
+                            'type': 'danger',
+                        })
+                        cr.commit()
+                except Exception:
+                    pass
+            finally:
+                with _defs_lock:
+                    _defs_running.pop(run_key, None)
+
+        threading.Thread(target=run_fetch, daemon=True).start()
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Metafield Fetch Started'),
+                'message': _('Fetching definitions and metaobject values from %s in the '
+                             'background — you will get progress notifications.') % instance_name,
+                'type': 'info',
+            },
+        }
+
+    def _run_definitions_sync(self, notify_uid=None):
+        """Fetch definitions + derive + metaobject values, committing along the
+        way and sending progress toasts. Runs in a background thread."""
+        self.ensure_one()
+
+        def _notify(title, message, msg_type='info'):
+            if not notify_uid:
+                return
+            try:
+                partner = self.env['res.users'].browse(notify_uid).partner_id
+                self.env['bus.bus']._sendone(partner, 'simple_notification', {
+                    'title': title, 'message': message, 'type': msg_type,
+                })
+                self.env.cr.commit()
+            except Exception as bus_err:
+                _logger.warning('Bus notification failed: %s', bus_err)
+
+        created = 0
+        # 1) From Shopify definitions API
+        for owner_type, gql_type in (('product', 'PRODUCT'), ('variant', 'PRODUCTVARIANT')):
+            for d in self.fetch_metafield_definitions(gql_type):
+                if self._upsert_definition(owner_type, d.get('namespace'), d.get('key'),
+                                           d.get('name'), d.get('type'), d.get('description'),
+                                           d.get('metaobject_definition_gid')):
+                    created += 1
+            self.env.cr.commit()
+
+        # 2) Derive from already-imported metafields (distinct namespace/key/type)
+        created += self._derive_definitions_from_metafields()
+        self.env.cr.commit()
+        _notify(_('Metafield Definitions'),
+                _('Definitions ready (%s newly added). Fetching metaobject values...') % created)
+
+        # 3) Fetch the metaobject ENTRIES (the selectable values, e.g. all
+        #    'Diaper Size' options) so merchants can pick them on the product.
+        entries = self._fetch_metaobjects(notify=_notify)
+
+        total = self.env['shopify.metafield.definition'].search_count([
+            ('shopify_instance_id', '=', self.id)])
+        _notify(_('Metafield Fetch Complete'),
+                _('All done! %s definitions available, %s metaobject values fetched.') % (total, entries),
+                'success' if entries or total else 'warning')
+        return total, entries
+
+    def _fetch_metaobjects(self, notify=None):
+        """Fetch all metaobject entries of the store (paginated) and store them
+        as shopify.metaobject records. Commits per metaobject type so progress
+        is never lost. Returns the number of entries seen."""
+        self.ensure_one()
+        Metaobject = self.env['shopify.metaobject']
+        count = 0
+        last_notified = 0
+
+        # 1) All metaobject definitions (type handles)
+        defs = []
+        after = None
+        q_defs = """
+        query($after: String) {
+          metaobjectDefinitions(first: 100, after: $after) {
+            edges { node { id type name } }
+            pageInfo { hasNextPage endCursor }
+          }
+        }
+        """
+        try:
+            while True:
+                data = self._execute_graphql(q_defs, {'after': after})
+                block = data.get('metaobjectDefinitions', {})
+                defs += [e.get('node', {}) for e in block.get('edges', [])]
+                page = block.get('pageInfo', {})
+                if page.get('hasNextPage'):
+                    after = page.get('endCursor')
+                else:
+                    break
+        except Exception as e:
+            _logger.warning('[metaobjects] could not fetch definitions: %s', e)
+            return 0
+
+        # 2) All entries per definition type
+        q_objs = """
+        query($type: String!, $after: String) {
+          metaobjects(type: $type, first: 250, after: $after) {
+            edges { node { id displayName handle type } }
+            pageInfo { hasNextPage endCursor }
+          }
+        }
+        """
+        for d in defs:
+            mtype = d.get('type')
+            def_gid = d.get('id') or ''
+            if not mtype:
+                continue
+            after = None
+            try:
+                while True:
+                    data = self._execute_graphql(q_objs, {'type': mtype, 'after': after})
+                    block = data.get('metaobjects', {})
+                    for edge in block.get('edges', []):
+                        node = edge.get('node', {})
+                        gid = node.get('id')
+                        if not gid:
+                            continue
+                        vals = {
+                            'name': node.get('displayName') or node.get('handle') or gid,
+                            'handle': node.get('handle') or '',
+                            'shopify_gid': gid,
+                            'metaobject_type': node.get('type') or mtype,
+                            'definition_gid': def_gid,
+                            'shopify_instance_id': self.id,
+                        }
+                        existing = Metaobject.search([
+                            ('shopify_instance_id', '=', self.id),
+                            ('shopify_gid', '=', gid),
+                        ], limit=1)
+                        if existing:
+                            existing.write(vals)
+                        else:
+                            Metaobject.create(vals)
+                        count += 1
+                    page = block.get('pageInfo', {})
+                    if page.get('hasNextPage'):
+                        after = page.get('endCursor')
+                    else:
+                        break
+                # Persist each finished type immediately; report progress.
+                self.env.cr.commit()
+                if notify and count - last_notified >= 200:
+                    last_notified = count
+                    notify(_('Metaobject Values'), _('%s values fetched so far...') % count)
+            except Exception as e:
+                _logger.warning('[metaobjects] fetch failed for type %s: %s', mtype, e)
+                self.env.cr.rollback()
+                continue
+        _logger.info('[metaobjects] %s entries fetched for instance %s', count, self.name)
+        return count
+
+    def _derive_definitions_from_metafields(self):
+        """Create definition records from the distinct metafields already
+        imported on this instance's products/variants. Returns count created."""
+        self.ensure_one()
+        rows = self.env['shopify.product.metafield'].search_read(
+            [('shopify_instance_id', '=', self.id)],
+            ['owner_type', 'namespace', 'key', 'type', 'label'],
+        )
+        created = 0
+        seen = set()
+        for r in rows:
+            owner = r.get('owner_type') or 'product'
+            ns = r.get('namespace') or ''
+            key = r.get('key') or ''
+            combo = (owner, ns, key)
+            if combo in seen or not key:
+                continue
+            seen.add(combo)
+            if self._upsert_definition(owner, ns, key, r.get('label'), r.get('type')):
+                created += 1
+        return created
 
     def test_connection(self):
         self.ensure_one()

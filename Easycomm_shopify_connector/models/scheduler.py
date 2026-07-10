@@ -202,12 +202,8 @@ class ShopifyScheduler(models.Model):
             # Sync Collections
             if self.sync_collections:
                 try:
-                    collection = self.env['shopify.collection'].create({
-                        'name': 'Sync Trigger',
-                        'shopify_instance_id': self.shopify_instance_id.id,
-                    })
-                    collection.sync_from_shopify()
-                    collection.unlink()
+                    self.env['shopify.collection'].sync_collections_from_shopify(
+                        self.shopify_instance_id.id)
                     success_messages.append('Collections synced successfully')
                 except Exception as e:
                     errors.append(f'Collection sync failed: {str(e)}')

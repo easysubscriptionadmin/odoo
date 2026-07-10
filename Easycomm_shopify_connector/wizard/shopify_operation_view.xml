@@ -15,6 +15,7 @@
                         <field name="import_product_variants"/>
                         <field name="import_product_images"/>
                         <field name="import_product_metafields"/>
+                        <field name="import_product_collections"/>
                         <div class="text-muted" colspan="2">
                             All options on = a complete import: every variant, option, image and metafield,
                             plus the full raw JSON of each product. Turning options off speeds up large imports.

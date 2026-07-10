@@ -15,6 +15,45 @@
                     </div>
                 </button>
             </xpath>
+            <!-- Hide Odoo's native tab — replaced by our combined
+                 "Attributes & Variants" page that also shows variant rows. -->
+            <xpath expr="//page[@name='variants']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!-- Shopify store (domain) shown right below the Barcode -->
+            <xpath expr="//page[@name='general_information']//field[@name='barcode']" position="after">
+                <field name="shopify_company" readonly="1" invisible="not shopify_instance_id"/>
+            </xpath>
+            <xpath expr="//page[@name='general_information']" position="inside">
+                <group string="Shopify Attributes" name="shopify_attributes">
+                    <group>
+                        <field name="shopify_brand"/>
+                        <field name="shopify_brand_code"/>
+                        <field name="shopify_dimensions"/>
+                        <field name="shopify_arabic_name"/>
+                        <field name="shopify_mpn"/>
+                        <field name="shopify_recommended_age"/>
+                        <field name="shopify_battery_information"/>
+                        <field name="shopify_assembly_required"/>
+                        <field name="shopify_header_select"/>
+                        <field name="shopify_meta_label"/>
+                        <field name="shopify_mf_color"/>
+                    </group>
+                    <group>
+                        <field name="shopify_rating_value"/>
+                        <field name="shopify_free_installation"/>
+                        <field name="shopify_skills"/>
+                        <field name="shopify_characters"/>
+                        <field name="shopify_mf_discount"/>
+                        <field name="shopify_category_new"/>
+                        <field name="shopify_sub_category_new"/>
+                        <field name="shopify_age_new"/>
+                        <field name="shopify_gender_new"/>
+                        <field name="shopify_diaper_size"/>
+                        <field name="shopify_mf_type"/>
+                    </group>
+                </group>
+            </xpath>
             <xpath expr="//page[@name='general_information']" position="after">
                 <page string="Shopify" name="shopify">
                     <div class="alert alert-success" role="alert" invisible="not shopify_product_id">
@@ -38,6 +77,11 @@
                             <field name="shopify_product_type"/>
                             <field name="shopify_vendor"/>
                             <field name="shopify_tags"/>
+                            <field name="shopify_collection_ids" widget="many2many_tags"
+                                   options="{'no_create': True}"
+                                   domain="[('shopify_instance_id', '=', shopify_instance_id)]"
+                                   help="Pick the collections for this product. Custom collections are pushed to Shopify on sync."/>
+                            <field name="shopify_collections" readonly="1"/>
                             <field name="shopify_handle" readonly="1"/>
                             <field name="shopify_template_suffix" readonly="1"/>
                             <field name="shopify_published_at" readonly="1"/>
@@ -50,62 +94,113 @@
                         </group>
                     </group>
                     <div invisible="not is_shopify_product">
-                    <separator string="Media (all images)"/>
-                    <field name="shopify_image_ids" readonly="1" nolabel="1">
-                        <list>
-                            <field name="image_128" widget="image" options="{'size': [64, 64]}" string="Image"/>
-                            <field name="name"/>
-                            <field name="sequence" string="Position"/>
-                            <field name="src" string="URL" optional="hide"/>
+                    <div class="alert alert-info" role="alert">
+                        Pick a metafield from the <b>Field</b> dropdown (its namespace, key and type fill in
+                        automatically) and enter the <b>Value</b>. Add images in the <b>Media</b> tab.
+                        Tip: on the Shopify Instance, click <b>Fetch Metafield Definitions</b> so the dropdown is populated.
+                    </div>
+                    <separator string="Product Metafields"/>
+                    <field name="shopify_metafield_ids" nolabel="1"
+                           context="{'default_owner_type': 'product', 'default_shopify_instance_id': shopify_instance_id}">
+                        <list editable="bottom">
+                            <field name="label" string="Field" readonly="1"/>
+                            <field name="definition_id" string="Select Field"
+                                   domain="[('owner_type','=','product')]"
+                                   options="{'no_create': True}"/>
+                            <field name="metaobject_definition_gid" column_invisible="1"/>
+                            <field name="metaobject_ids" string="Select Values" widget="many2many_tags"
+                                   options="{'no_create': True}"
+                                   domain="[('definition_gid', '=', metaobject_definition_gid)]"/>
+                            <field name="collection_ids" string="Select Collections" widget="many2many_tags"
+                                   options="{'no_create': True}" optional="show"/>
+                            <field name="ref_product_ids" string="Select Products" widget="many2many_tags"
+                                   options="{'no_create': True}" optional="show"
+                                   domain="[('is_shopify_product','=',True)]"/>
+                            <field name="value" string="Value"/>
+                            <field name="namespace" readonly="1" optional="show"/>
+                            <field name="key" readonly="1" optional="show"/>
+                            <field name="type" readonly="1" optional="show"/>
                         </list>
                     </field>
 
-                    <separator string="Variants (price · media · quantity)"/>
-                    <field name="product_variant_ids" readonly="1" nolabel="1">
-                        <list>
-                            <field name="image_128" widget="image" options="{'size': [40, 40]}" string="Image"/>
+                    <separator string="Variant Metafields"/>
+                    <field name="shopify_variant_metafield_ids" nolabel="1"
+                           context="{'default_owner_type': 'variant', 'default_shopify_instance_id': shopify_instance_id}">
+                        <list editable="bottom">
+                            <field name="product_variant_id" string="Variant"
+                                   domain="[('product_tmpl_id','=',parent.id)]"
+                                   options="{'no_create': True}"/>
+                            <field name="label" string="Field" readonly="1"/>
+                            <field name="definition_id" string="Select Field"
+                                   domain="[('owner_type','=','variant')]"
+                                   options="{'no_create': True}"/>
+                            <field name="metaobject_definition_gid" column_invisible="1"/>
+                            <field name="metaobject_ids" string="Select Values" widget="many2many_tags"
+                                   options="{'no_create': True}"
+                                   domain="[('definition_gid', '=', metaobject_definition_gid)]"/>
+                            <field name="value" string="Value"/>
+                            <field name="key" readonly="1" optional="show"/>
+                            <field name="type" readonly="1" optional="hide"/>
+                        </list>
+                    </field>
+
+                    <group string="Raw Data (every key from Shopify)" invisible="not shopify_raw_data">
+                        <field name="shopify_options_json" readonly="1" widget="text" nolabel="1"/>
+                        <field name="shopify_raw_data" readonly="1" widget="text" nolabel="1"/>
+                    </group>
+                    </div>
+                </page>
+                <page string="Media" name="shopify_media_page">
+                    <div class="alert alert-info" role="alert" invisible="shopify_image_ids">
+                        No images yet. Click <b>Add a line</b> to upload product images —
+                        they are pushed to Shopify when you sync.
+                    </div>
+                    <field name="shopify_image_ids" nolabel="1"
+                           context="{'default_shopify_instance_id': shopify_instance_id}">
+                        <list editable="bottom">
+                            <field name="image_1920" widget="image" options="{'size': [90, 90]}" string="Image"/>
+                            <field name="name"/>
+                            <field name="alt" string="Alt Text" optional="show"/>
+                            <field name="sequence" string="Position"/>
+                            <field name="src" string="Source URL" optional="hide"/>
+                            <field name="shopify_image_id" string="Shopify Image ID" readonly="1" optional="hide"/>
+                        </list>
+                    </field>
+                </page>
+                <page string="Attributes &amp; Variants" name="shopify_variants_page">
+                    <div class="alert alert-info" role="alert">
+                        Every variant of this product with its Shopify data — including the default
+                        variant for products without options. Edit values here and click
+                        <b>Sync to Shopify</b> to push them.
+                    </div>
+                    <separator string="Attributes (options like Size or Color)"/>
+                    <field name="attribute_line_ids" nolabel="1">
+                        <list editable="bottom">
+                            <field name="attribute_id"/>
+                            <field name="value_ids" widget="many2many_tags"
+                                   domain="[('attribute_id', '=', attribute_id)]"
+                                   context="{'default_attribute_id': attribute_id}"/>
+                        </list>
+                    </field>
+                    <separator string="Variants"/>
+                    <field name="product_variant_ids" nolabel="1">
+                        <list editable="bottom">
+                            <field name="image_1920" widget="image" options="{'size': [64, 64]}" string="Image"/>
                             <field name="shopify_variant_title" string="Variant"/>
+                            <field name="shopify_option1" string="Option 1" optional="show"/>
+                            <field name="shopify_option2" string="Option 2" optional="hide"/>
+                            <field name="shopify_option3" string="Option 3" optional="hide"/>
                             <field name="default_code" string="SKU"/>
                             <field name="barcode" string="Barcode"/>
                             <field name="lst_price" string="Price"/>
                             <field name="shopify_compare_at_price" string="Compare At"/>
                             <field name="shopify_inventory_quantity" string="Shopify Qty"/>
-                            <field name="qty_available" string="On Hand"/>
-                            <field name="shopify_variant_id" string="Shopify Variant ID" optional="hide"/>
+                            <field name="qty_available" string="On Hand" readonly="1"/>
+                            <field name="shopify_weight" string="Weight" optional="hide"/>
+                            <field name="shopify_barcode" string="Shopify Barcode" optional="hide"/>
+                            <field name="shopify_variant_id" string="Shopify Variant ID" readonly="1" optional="hide"/>
                         </list>
                     </field>
-
-                    <separator string="Product Metafields"/>
-                    <field name="shopify_metafield_ids" readonly="1" nolabel="1">
-                        <list>
-                            <field name="label" string="Field"/>
-                            <field name="display_value" string="Value"
-                                   decoration-muted="not is_set"/>
-                            <field name="is_set" column_invisible="1"/>
-                            <field name="namespace" optional="hide"/>
-                            <field name="key" optional="show"/>
-                            <field name="type" optional="hide"/>
-                        </list>
-                    </field>
-
-                    <separator string="Variant Metafields"/>
-                    <field name="shopify_variant_metafield_ids" readonly="1" nolabel="1">
-                        <list>
-                            <field name="product_variant_id" string="Variant"/>
-                            <field name="label" string="Field"/>
-                            <field name="display_value" string="Value"
-                                   decoration-muted="not is_set"/>
-                            <field name="is_set" column_invisible="1"/>
-                            <field name="key" optional="show"/>
-                            <field name="type" optional="hide"/>
-                        </list>
-                    </field>
-
-                    <group string="Raw Data (every key from Shopify)">
-                        <field name="shopify_options_json" readonly="1" widget="text" nolabel="1"/>
-                        <field name="shopify_raw_data" readonly="1" widget="text" nolabel="1"/>
-                    </group>
-                    </div>
                 </page>
             </xpath>
         </field>

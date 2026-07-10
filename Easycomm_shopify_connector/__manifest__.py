@@ -51,6 +51,7 @@ Key Features:
     'data': [
         'security/ir.model.access.csv',
         'data/sequence.xml',
+        'data/partner_tag.xml',
         'views/shopify_instance_view.xml',
         'views/product_view.xml',
         'views/partner_view.xml',
@@ -68,6 +69,8 @@ Key Features:
         'views/discount_view.xml',
         'wizard/shopify_operation_view.xml',
         'wizard/shopify_refund_wizard_view.xml',
+        'wizard/shopify_product_sync_view.xml',
+        'wizard/shopify_customer_sync_view.xml',
         'views/menu_view.xml',
     ],
     'demo': [],
@@ -83,6 +86,6 @@ Key Features:
     'application': True,
     'auto_install': False,
     'post_init_hook': 'post_init_hook',
-     'price': 250,
+     'price': 150,
     'currency': 'USD',
 }

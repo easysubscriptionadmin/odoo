@@ -196,13 +196,19 @@ class SaleOrder(models.Model):
                         if not existing_order.order_line:
                             self._create_order_lines(existing_order, order_data.get('line_items', []))
                             self._create_shipping_line(existing_order, order_data)
+                            self._create_discount_line(existing_order, order_data)
+                        self._apply_shopify_order_state(existing_order, order_data)
                         updated_count += 1
                 else:
                     new_order = self.with_context(**ctx).create(order_vals)
                     # Create order lines
                     self._create_order_lines(new_order, order_data.get('line_items', []))
-                    # Shipping charge as a dedicated service line (req #8)
+                    # Shipping charge and discount as dedicated lines (client spec)
                     self._create_shipping_line(new_order, order_data)
+                    self._create_discount_line(new_order, order_data)
+                    # Map the Shopify fulfillment status to the Odoo state:
+                    # unfulfilled -> Quotation, fulfilled/partial -> Sales Order
+                    self._apply_shopify_order_state(new_order, order_data)
                     created_count += 1
 
             except Exception as e:
@@ -369,31 +375,21 @@ class SaleOrder(models.Model):
                 else:
                     quantity = float(quantity) if quantity else 1.0
 
-                # Discount — Shopify allocates BOTH line-level and order-level
-                # discounts to each line via `discount_allocations`. Summing them
-                # and converting to a percentage covers requirement #7.
-                discount_amount = sum(
-                    float(da.get('amount', 0) or 0)
-                    for da in line_item.get('discount_allocations', [])
-                )
-                discount_pct = 0.0
-                if discount_amount and price and quantity:
-                    discount_pct = min(100.0, (discount_amount / (price * quantity)) * 100.0)
-
+                # NOTE (client spec): discounts are NOT applied per line — they
+                # are added as a separate negative "Discount" line by
+                # _create_discount_line, so product lines keep their full price.
                 line_vals = {
                     'order_id': order.id,
                     'product_id': product.id,
                     'name': line_item.get('title') or line_item.get('name') or product.name,
                     'product_uom_qty': quantity,
                     'price_unit': price,
-                    'discount': discount_pct,
                     'shopify_line_id': str(line_item.get('id', '')),
                 }
 
                 order_line_obj.with_context(shopify_sync_skip=True).create(line_vals)
                 _logger.info(
-                    f"Created order line: {line_item.get('title')} - Qty: {quantity} "
-                    f"- Price: {price} - Discount: {discount_pct:.2f}%"
+                    f"Created order line: {line_item.get('title')} - Qty: {quantity} - Price: {price}"
                 )
 
             except Exception as e:
@@ -442,6 +438,67 @@ class SaleOrder(models.Model):
             'price_unit': total,
         })
         _logger.info(f'Created shipping line for order {order.name}: {total}')
+
+    def _get_discount_product(self):
+        """Return (or create) the service product used for Shopify discounts."""
+        product = self.env['product.product'].search(
+            [('default_code', '=', 'SHOPIFY_DISCOUNT')], limit=1)
+        if not product:
+            product = self.env['product.product'].create({
+                'name': 'Discount',
+                'default_code': 'SHOPIFY_DISCOUNT',
+                'type': 'service',
+                'invoice_policy': 'order',
+                'sale_ok': True,
+                'purchase_ok': False,
+                'list_price': 0.0,
+            })
+        return product
+
+    def _create_discount_line(self, order, order_data):
+        """Add the Shopify order discount as a separate NEGATIVE line (client
+        spec) so it shows on the Sales Order and Invoice like in Shopify.
+
+        Shipping discounts are excluded: the shipping line already subtracts
+        its own discount allocations."""
+        total_disc = float(order_data.get('total_discounts', 0) or 0)
+        if total_disc <= 0:
+            return
+        shipping_disc = sum(
+            float(d.get('amount', 0) or 0)
+            for sl in order_data.get('shipping_lines', [])
+            for d in sl.get('discount_allocations', [])
+        )
+        amount = total_disc - shipping_disc
+        if amount <= 0:
+            return
+        codes = ', '.join(dc.get('code', '') for dc in order_data.get('discount_codes', []) if dc.get('code'))
+        product = self._get_discount_product()
+        self.env['sale.order.line'].with_context(shopify_sync_skip=True).create({
+            'order_id': order.id,
+            'product_id': product.id,
+            'name': _('Discount') + (f' ({codes})' if codes else ''),
+            'product_uom_qty': 1,
+            'price_unit': -amount,
+        })
+        _logger.info(f'Created discount line for order {order.name}: -{amount}')
+
+    def _apply_shopify_order_state(self, order, order_data):
+        """Map the Shopify order status onto the Odoo document state:
+        unfulfilled -> Quotation (draft), fulfilled/partial -> confirmed
+        Sales Order, cancelled -> cancelled. (Client spec.)"""
+        try:
+            ctx_order = order.with_context(shopify_sync_skip=True)
+            if order_data.get('cancelled_at'):
+                if order.state != 'cancel':
+                    ctx_order.action_cancel()
+                return
+            fstatus = order_data.get('fulfillment_status')  # None / fulfilled / partial
+            if fstatus in ('fulfilled', 'partial') and order.state in ('draft', 'sent'):
+                ctx_order.action_confirm()
+                _logger.info('Order %s confirmed (Shopify status: %s)', order.name, fstatus)
+        except Exception as e:
+            _logger.warning('Could not apply Shopify state on %s: %s', order.name, e)
 
     def _create_generic_product(self, line_item, instance):
         """Create a generic product when product cannot be found"""
@@ -649,6 +706,107 @@ class SaleOrder(models.Model):
                 )
         return result
 
+    def action_confirm(self):
+        """Confirming a Shopify order in Odoo marks it 'In Progress' in Shopify
+        (client spec): try the official fulfillmentOrderReportProgress mutation,
+        fall back to an 'In Progress' order tag."""
+        result = super().action_confirm()
+        if self.env.context.get('shopify_sync_skip'):
+            return result
+        for order in self:
+            if order.is_shopify_order and order.shopify_order_id and order.shopify_instance_id:
+                try:
+                    order.with_context(shopify_sync_skip=True).mark_in_progress_in_shopify()
+                except Exception as e:
+                    _logger.warning(f'Mark-in-progress in Shopify failed for {order.name}: {e}')
+        return result
+
+    def mark_in_progress_in_shopify(self):
+        """Best effort 'Mark as in progress' on the Shopify order.
+
+        1. fulfillmentOrderReportProgress (API 2026-04+) on each open
+           fulfillment order — the official way when available.
+        2. Fallback: add an 'In Progress' tag on the order so staff can see
+           and filter it in the Shopify admin.
+        """
+        self.ensure_one()
+        instance = self.shopify_instance_id
+        if not instance or not self.shopify_order_id:
+            return
+
+        # ── Attempt the official mutation on each open fulfillment order ──
+        try:
+            url = f"{instance._get_base_url()}/orders/{self.shopify_order_id}/fulfillment_orders.json"
+            resp = requests.get(url, headers=instance._get_headers(), timeout=30, verify=certifi.where())
+            open_fos = [fo for fo in resp.json().get('fulfillment_orders', [])
+                        if resp.status_code == 200 and fo.get('status') == 'open']
+            if open_fos:
+                gql_url = f"https://{instance._get_shop_domain()}/admin/api/2026-04/graphql.json"
+                mutation = """
+                mutation fulfillmentOrderReportProgress($id: ID!) {
+                  fulfillmentOrderReportProgress(id: $id) {
+                    fulfillmentOrder { id status }
+                    userErrors { field message }
+                  }
+                }
+                """
+                all_ok = True
+                for fo in open_fos:
+                    r = requests.post(
+                        gql_url, headers=instance._get_headers(),
+                        json={'query': mutation,
+                              'variables': {'id': f"gid://shopify/FulfillmentOrder/{fo['id']}"}},
+                        timeout=30, verify=certifi.where())
+                    data = r.json() if r.status_code == 200 else {}
+                    errs = (data.get('errors')
+                            or (data.get('data', {}) or {}).get(
+                                'fulfillmentOrderReportProgress', {}).get('userErrors'))
+                    if r.status_code != 200 or errs or not data.get('data'):
+                        _logger.info('[in_progress] reportProgress not accepted for %s: %s',
+                                     self.name, errs or r.status_code)
+                        all_ok = False
+                        break
+                if all_ok:
+                    _logger.info('[in_progress] Order %s marked In Progress in Shopify (official)', self.name)
+                    return True
+        except Exception as e:
+            _logger.info('[in_progress] reportProgress attempt failed for %s: %s — using tag fallback',
+                         self.name, e)
+
+        # ── Fallback: tag the order ──
+        self._add_shopify_order_tag('In Progress')
+        return True
+
+    def _add_shopify_order_tag(self, tag):
+        """Append a tag to the Shopify order (keeps existing tags)."""
+        self.ensure_one()
+        instance = self.shopify_instance_id
+        try:
+            base = instance._get_base_url()
+            r = requests.get(f"{base}/orders/{self.shopify_order_id}.json",
+                             headers=instance._get_headers(),
+                             params={'fields': 'id,tags'}, timeout=30, verify=certifi.where())
+            if r.status_code != 200:
+                _logger.warning('[order_tag] could not read tags for %s: %s', self.name, r.status_code)
+                return
+            tags = r.json().get('order', {}).get('tags', '') or ''
+            tag_list = [t.strip() for t in tags.split(',') if t.strip()]
+            if tag in tag_list:
+                return
+            tag_list.append(tag)
+            resp = requests.put(
+                f"{base}/orders/{self.shopify_order_id}.json",
+                headers=instance._get_headers(),
+                json={'order': {'id': int(self.shopify_order_id), 'tags': ', '.join(tag_list)}},
+                timeout=30, verify=certifi.where())
+            if resp.status_code == 200:
+                _logger.info('[order_tag] "%s" tag added on Shopify order for %s', tag, self.name)
+            else:
+                _logger.warning('[order_tag] tagging failed for %s: %s %s',
+                                self.name, resp.status_code, resp.text[:150])
+        except Exception as e:
+            _logger.warning('[order_tag] error for %s: %s', self.name, e)
+
     def _build_shopify_address(self, partner):
         """Build a Shopify MailingAddressInput dict from an Odoo res.partner record."""
         if not partner:
@@ -821,8 +979,14 @@ class SaleOrder(models.Model):
             _logger.error(f'Error cancelling order in Shopify: {str(e)}')
             raise UserError(_('Error cancelling order in Shopify: %s') % str(e))
 
-    def create_fulfillment_in_shopify(self):
-        """Fulfill the order in Shopify using fulfillmentCreateV2 GraphQL mutation"""
+    def create_fulfillment_in_shopify(self, picking=None):
+        """Fulfill the order in Shopify using fulfillmentCreateV2.
+
+        With `picking`: only the quantities actually delivered by that
+        validated transfer are fulfilled — Shopify then shows the order as
+        Partially Fulfilled until everything is delivered (client spec).
+        Without `picking` (manual button): fulfills everything still open.
+        """
         self.ensure_one()
         if not self.shopify_order_id or not self.shopify_instance_id:
             raise UserError(_('This order is not linked to a Shopify instance'))
@@ -848,10 +1012,50 @@ class SaleOrder(models.Model):
         if not open_orders:
             raise UserError(_('No open fulfillment orders found. The order may already be fulfilled or cancelled in Shopify.'))
 
-        line_items_by_fo = [
-            {"fulfillmentOrderId": f"gid://shopify/FulfillmentOrder/{fo['id']}"}
-            for fo in open_orders
-        ]
+        fully_fulfilled = True
+        if picking:
+            # Ensure order lines are linked to their Shopify line items.
+            if not any(l.shopify_line_id for l in self.order_line):
+                self._fetch_and_store_shopify_line_ids()
+            # Quantities actually delivered by this transfer, per Shopify line.
+            delivered = {}
+            for move in picking.move_ids:
+                if move.state != 'done' or not move.sale_line_id:
+                    continue
+                sid = move.sale_line_id.shopify_line_id
+                if sid and str(sid).isdigit():
+                    delivered[str(sid)] = delivered.get(str(sid), 0) + int(move.quantity)
+
+            line_items_by_fo = []
+            for fo in open_orders:
+                items = []
+                for li in fo.get('line_items', []):
+                    sid = str(li.get('line_item_id'))
+                    fulfillable = int(li.get('fulfillable_quantity') or 0)
+                    want = min(delivered.get(sid, 0), fulfillable)
+                    if want > 0:
+                        items.append({
+                            'id': f"gid://shopify/FulfillmentOrderLineItem/{li['id']}",
+                            'quantity': want,
+                        })
+                        delivered[sid] -= want
+                    if want < fulfillable:
+                        fully_fulfilled = False
+                if items:
+                    line_items_by_fo.append({
+                        'fulfillmentOrderId': f"gid://shopify/FulfillmentOrder/{fo['id']}",
+                        'fulfillmentOrderLineItems': items,
+                    })
+            if not line_items_by_fo:
+                _logger.info('[fulfillment] Nothing fulfillable for %s from picking %s',
+                             self.name, picking.name)
+                return False
+        else:
+            # Manual/full path: fulfill everything still open.
+            line_items_by_fo = [
+                {"fulfillmentOrderId": f"gid://shopify/FulfillmentOrder/{fo['id']}"}
+                for fo in open_orders
+            ]
 
         # Step 2: Create fulfillment via GraphQL
         mutation = """
@@ -891,15 +1095,17 @@ class SaleOrder(models.Model):
                 fulfillment_id = fulfillment['id'].split('/')[-1]
                 self.with_context(shopify_sync_skip=True).write({
                     'shopify_fulfillment_id': fulfillment_id,
-                    'shopify_fulfillment_status': 'fulfilled',
+                    'shopify_fulfillment_status': 'fulfilled' if fully_fulfilled else 'partial',
                 })
 
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
-                    'title': _('Order Fulfilled'),
-                    'message': _('Fulfillment created in Shopify. Customer notified.'),
+                    'title': _('Order Fulfilled') if fully_fulfilled else _('Order Partially Fulfilled'),
+                    'message': _('Fulfillment created in Shopify. Customer notified.')
+                               if fully_fulfilled else
+                               _('Partial fulfillment created in Shopify for the delivered quantities.'),
                     'type': 'success',
                 }
             }
@@ -2062,10 +2268,15 @@ class StockPicking(models.Model):
                 continue
             _logger.info(
                 f'[StockPicking._action_done] Auto-fulfilling Shopify order for '
-                f'{sale_order.name} (Shopify #{sale_order.shopify_order_id})'
+                f'{sale_order.name} (Shopify #{sale_order.shopify_order_id}) '
+                f'from picking {picking.name}'
             )
             try:
-                sale_order.with_context(shopify_sync_skip=True).create_fulfillment_in_shopify()
+                # Pass the picking so only the DELIVERED quantities are
+                # fulfilled — a partial delivery makes the Shopify order
+                # "Partially Fulfilled" (client spec).
+                sale_order.with_context(shopify_sync_skip=True).create_fulfillment_in_shopify(
+                    picking=picking)
             except Exception as e:
                 _logger.warning(
                     f'[StockPicking._action_done] Shopify fulfillment failed for '

@@ -37,6 +37,9 @@ class ShopifyOperation(models.TransientModel):
     import_product_metafields = fields.Boolean(
         'Import Metafields', default=True,
         help='Fetch and store all product and variant metafields.')
+    import_product_collections = fields.Boolean(
+        'Import Collections', default=True,
+        help="Fetch each product's collections (stored like tags on the product).")
 
     # For order import date range filter
     import_orders_from_date = fields.Datetime(
@@ -103,6 +106,7 @@ class ShopifyOperation(models.TransientModel):
         skip_images = not self.import_product_images
         import_variants = self.import_product_variants
         import_metafields = self.import_product_metafields
+        import_collections = self.import_product_collections
         uid = self.env.uid
         registry = self.env.registry
 
@@ -118,6 +122,8 @@ class ShopifyOperation(models.TransientModel):
                         skip_images=skip_images,
                         import_variants=import_variants,
                         import_metafields=import_metafields,
+                        import_collections=import_collections,
+                        notify_uid=uid,
                     )
                     cr.commit()
                     partner = env['res.users'].browse(uid).partner_id
@@ -158,15 +164,60 @@ class ShopifyOperation(models.TransientModel):
         }
 
     def _import_customers(self):
-        """Import customers from Shopify"""
-        _logger.info(f'Starting customer import from Shopify instance: {self.shopify_instance_id.name}')
+        """Import customers from Shopify in a background thread.
 
-        try:
-            result = self.env['res.partner'].import_shopify_customers(self.shopify_instance_id.id)
-            return result
-        except Exception as e:
-            _logger.error(f'Error in customer import: {str(e)}')
-            raise UserError(_('Customer import failed: %s') % str(e))
+        Returns immediately with an 'Import started' toast. Progress toasts
+        (every batch) and a final completion toast are sent via the Odoo bus,
+        and customers appear in Odoo one batch at a time.
+        """
+        instance_id = self.shopify_instance_id.id
+        instance_name = self.shopify_instance_id.name
+        uid = self.env.uid
+        registry = self.env.registry
+
+        _logger.info(f'Scheduling background customer import for instance {instance_name}')
+
+        def run_import():
+            import odoo
+            with registry.cursor() as cr:
+                env = odoo.api.Environment(cr, uid, {})
+                try:
+                    env['res.partner'].import_shopify_customers(
+                        instance_id,
+                        batch_size=20,
+                        notify_uid=uid,
+                    )
+                    cr.commit()
+                except Exception as exc:
+                    _logger.error(f'Background customer import failed: {exc}')
+                    try:
+                        partner = env['res.users'].browse(uid).partner_id
+                        env['bus.bus']._sendone(partner, 'simple_notification', {
+                            'title': _('Customer Import Failed'),
+                            'message': str(exc),
+                            'type': 'danger',
+                        })
+                        cr.commit()
+                    except Exception:
+                        pass
+
+        thread = threading.Thread(target=run_import, daemon=True)
+        thread.start()
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Customer Import Started'),
+                'message': _(
+                    'Importing customers from Shopify in the background (batches of 20). '
+                    'You will receive a notification after each batch, and customers '
+                    'will appear one batch at a time.'
+                ),
+                'type': 'info',
+                'sticky': False,
+            }
+        }
 
     def _import_orders(self):
         """Import orders from Shopify in a background thread.
@@ -360,21 +411,55 @@ class ShopifyOperation(models.TransientModel):
             raise UserError(_('Customer export failed: %s') % str(e))
 
     def _import_collections(self):
-        """Import collections from Shopify"""
-        _logger.info(f'Starting collection import from Shopify instance: {self.shopify_instance_id.name}')
+        """Import collections from Shopify in a background thread.
 
-        try:
-            # Create a dummy collection record to trigger sync
-            collection = self.env['shopify.collection'].create({
-                'name': 'Sync Trigger',
-                'shopify_instance_id': self.shopify_instance_id.id,
-            })
-            result = collection.sync_from_shopify()
-            collection.unlink()  # Remove the dummy record
-            return result
-        except Exception as e:
-            _logger.error(f'Error in collection import: {str(e)}')
-            raise UserError(_('Collection import failed: %s') % str(e))
+        Big stores exceed the HTTP request time limit (which kills the request
+        and rolls everything back), so the import runs in its own cursor and
+        commits per collection. Progress toasts are sent via the bus.
+        """
+        instance_id = self.shopify_instance_id.id
+        instance_name = self.shopify_instance_id.name
+        uid = self.env.uid
+        registry = self.env.registry
+
+        _logger.info(f'Scheduling background collection import for instance {instance_name}')
+
+        def run_import():
+            import odoo
+            with registry.cursor() as cr:
+                env = odoo.api.Environment(cr, uid, {})
+                try:
+                    env['shopify.collection'].sync_collections_from_shopify(
+                        instance_id, notify_uid=uid)
+                    cr.commit()
+                except Exception as exc:
+                    _logger.error(f'Background collection import failed: {exc}', exc_info=True)
+                    try:
+                        partner = env['res.users'].browse(uid).partner_id
+                        env['bus.bus']._sendone(partner, 'simple_notification', {
+                            'title': _('Collection Import Failed'),
+                            'message': str(exc),
+                            'type': 'danger',
+                        })
+                        cr.commit()
+                    except Exception:
+                        pass
+
+        threading.Thread(target=run_import, daemon=True).start()
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Collection Import Started'),
+                'message': _(
+                    'Importing collections from %s in the background. Each collection '
+                    'is saved as it arrives — refresh the Collections list to watch progress.'
+                ) % instance_name,
+                'type': 'info',
+                'sticky': False,
+            }
+        }
 
     def _import_gift_cards(self):
         """Import gift cards from Shopify"""

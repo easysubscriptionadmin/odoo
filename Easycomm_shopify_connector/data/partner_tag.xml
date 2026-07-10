@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Tag automatically assigned to customers imported from / synced to Shopify -->
+    <record id="partner_category_shopify" model="res.partner.category">
+        <field name="name">Shopify Customer</field>
+        <field name="color">2</field>
+    </record>
+</odoo>

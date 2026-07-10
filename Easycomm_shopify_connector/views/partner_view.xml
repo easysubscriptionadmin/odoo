@@ -6,35 +6,78 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" icon="fa-shopping-cart"
+                        name="action_open_shopify_customer_sync_wizard" type="object"
+                        invisible="not is_shopify_customer and not shopify_instance_id">
+                    <div class="o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="shopify_total_spent" nolabel="1"/>
+                        </span>
+                        <span class="o_stat_text">Shopify Sales</span>
+                    </div>
+                </button>
+                <button class="oe_stat_button" icon="fa-file-text-o"
+                        name="action_open_shopify_customer_sync_wizard" type="object"
+                        invisible="not is_shopify_customer and not shopify_instance_id">
+                    <div class="o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="shopify_orders_count" nolabel="1"/>
+                        </span>
+                        <span class="o_stat_text">Shopify Orders</span>
+                    </div>
+                </button>
+            </xpath>
+            <!-- Shopify store (domain) shown right below the Tags field -->
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="shopify_company" readonly="1" invisible="not shopify_instance_id"/>
+            </xpath>
             <xpath expr="//notebook" position="inside">
-                <page string="Shopify" name="shopify" invisible="is_shopify_customer == False and shopify_instance_id == False">
+                <page string="Shopify" name="shopify">
+                    <div class="alert alert-success" role="alert" invisible="not shopify_customer_id">
+                        This customer is linked to Shopify. Click <b>Sync to Shopify</b> to push the latest changes.
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="shopify_customer_id">
+                        This customer is <b>not on Shopify yet</b>. Click <b>Sync to Shopify</b>, pick the store
+                        (instance), and it will be created there.
+                    </div>
+                    <button name="action_open_shopify_customer_sync_wizard" type="object"
+                            string="Sync to Shopify" class="btn-primary" icon="fa-shopping-cart"/>
                     <group>
-                        <group>
+                        <group string="Identity">
                             <field name="is_shopify_customer"/>
                             <field name="shopify_instance_id"/>
                             <field name="shopify_customer_id" readonly="1"/>
                             <field name="shopify_state"/>
+                            <field name="shopify_customer_tags"/>
+                            <field name="shopify_currency" readonly="1"/>
+                            <field name="shopify_tax_exempt"/>
                         </group>
-                        <group>
-                            <field name="shopify_email_verified"/>
-                            <field name="shopify_accepts_marketing"/>
-                            <field name="shopify_orders_count" readonly="1"/>
-                            <field name="shopify_total_spent" readonly="1"/>
+                        <group string="Sales Statistics">
+                            <field name="shopify_orders_count" readonly="1" string="Total Orders"/>
+                            <field name="shopify_total_spent" readonly="1" string="Total Sales"/>
+                            <field name="shopify_last_order_name" readonly="1"/>
+                            <field name="shopify_last_order_id" readonly="1"/>
                         </group>
                     </group>
-                    <group string="Sync Information">
-                        <group>
+                    <group>
+                        <group string="Marketing">
+                            <field name="shopify_email_verified"/>
+                            <field name="shopify_accepts_marketing"/>
+                            <field name="shopify_email_marketing_state" readonly="1"/>
+                            <field name="shopify_sms_marketing_state" readonly="1"/>
+                        </group>
+                        <group string="Sync Information">
                             <field name="shopify_created_at" readonly="1"/>
                             <field name="shopify_updated_at" readonly="1"/>
                         </group>
                     </group>
-                    <div class="oe_chatter">
-                        <button name="export_customer_to_shopify"
-                                type="object"
-                                string="Export to Shopify"
-                                class="oe_highlight"
-                                invisible="shopify_instance_id == False"/>
-                    </div>
+                    <group string="Shopify Note" invisible="not shopify_note">
+                        <field name="shopify_note" nolabel="1"/>
+                    </group>
+                    <group string="Raw Data (every key from Shopify)" invisible="not shopify_raw_data">
+                        <field name="shopify_raw_data" readonly="1" widget="text" nolabel="1"/>
+                    </group>
                 </page>
             </xpath>
         </field>
@@ -50,6 +93,9 @@
                 <field name="is_shopify_customer" optional="hide"/>
                 <field name="shopify_customer_id" optional="hide"/>
                 <field name="shopify_instance_id" optional="hide"/>
+                <field name="shopify_orders_count" string="Total Orders" optional="show"/>
+                <field name="shopify_total_spent" string="Total Sales" optional="show"/>
+                <field name="shopify_customer_tags" string="Shopify Tags" optional="hide"/>
             </xpath>
         </field>
     </record>

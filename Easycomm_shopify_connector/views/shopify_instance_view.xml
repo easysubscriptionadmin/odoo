@@ -13,6 +13,10 @@
                             help="Fetch an Admin API access token from Shopify using the Client ID/Secret (client credentials grant)."/>
                     <button name="test_connection" type="object" string="Test Connection"
                             invisible="not access_token"/>
+                    <button name="action_fetch_metafield_definitions" type="object"
+                            string="Fetch Metafield Definitions"
+                            invisible="not access_token"
+                            help="Load the store's metafield definitions so they appear in the Field dropdown on products."/>
                 </header>
                 <sheet>
                     <group>
